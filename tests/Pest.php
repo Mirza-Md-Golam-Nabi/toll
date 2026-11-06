@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\Booth;
+use App\Models\Shift;
+use App\Models\ShiftSession;
+use App\Models\User;
+use App\Models\VehicleCategory;
+use App\Services\ShiftService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +21,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,7 +50,26 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * A ready-to-collect booth: booth, all-day shift, operator, manager (PIN 1234) and a car category at ৳50.
+ *
+ * @return object{booth: Booth, shift: Shift, operator: User, manager: User, car: VehicleCategory}
+ */
+function tollSetup(): object
 {
-    // ..
+    $booth = Booth::factory()->create(['code' => config('toll.booth_code')]);
+
+    return (object) [
+        'booth' => $booth,
+        'shift' => Shift::factory()->create(),
+        'operator' => User::factory()->operator($booth)->create(),
+        'manager' => User::factory()->manager('1234')->create(['booth_id' => $booth->id]),
+        'car' => VehicleCategory::factory()->withRate(50)->create(['code' => 'CAR', 'shortcut_key' => 'F3']),
+    ];
+}
+
+/** Opens a shift for the operator through the real service. */
+function openShift(object $setup, float $openingCash = 0): ShiftSession
+{
+    return app(ShiftService::class)->open($setup->operator, $setup->shift, $openingCash);
 }

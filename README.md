@@ -1,58 +1,59 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Toll Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Toll collection software for **Syed Mash-ud Rumi Bridge** (quotation QT-001, Phase 1).
+Built with Laravel 13, Filament 5 and MySQL 8.
 
-## About Laravel
+## Features (Phase 1)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Vehicle categories & rates**: rate history with effective dates; past tickets keep their amounts.
+- **Collection screen**: one key press (F1–F11) issues and prints a ticket. Number plates are optional, with suggestions from earlier passes.
+- **Shifts**: opening cash at the start, then cash declaration and reconciliation at close.
+- **Receipts**: 58mm thermal printing over ESC/POS, with a browser-print fallback. Reprints are marked DUPLICATE.
+- **Offline first**: each booth runs on its own local database and syncs with the central server every minute.
+- **Audit trail**: logs every login, shift, ticket and override. Voids and category corrections need a manager PIN.
+- **Roles**: Super Admin, Plaza Manager and Booth Operator.
+- **Reports**: daily, shift-wise, category-wise and operator-wise collection, with CSV export and print. The dashboard shows charts.
+- **Language**: Bangla / English interface.
+- **Phase 2 ready**: tickets already carry `plate_source`, `plate_image` and `anpr_confidence` for ANPR.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Local development
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env && php artisan key:generate
+php artisan migrate --seed            # booth, shifts, sample categories, demo users
+php artisan db:seed --class=DemoDataSeeder   # optional: 30 days of demo traffic
+php artisan filament:assets
+php artisan serve --port=8010
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Open http://127.0.0.1:8010/admin. Demo accounts (local only, password `password`):
 
-## Contributing
+| Role | Email | Approval PIN |
+|---|---|---|
+| Super Admin | admin@toll.test | 1234 |
+| Plaza Manager | manager@toll.test | 4321 |
+| Booth Operator | operator@toll.test | — |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Tests run against the MySQL database `toll_management_test`:
 
-## Code of Conduct
+```bash
+php artisan test --compact
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Deployment & training
 
-## Security Vulnerabilities
+- [docs/deployment.md](docs/deployment.md): booth PC and central server setup, printer, sync, maintenance (Bangla)
+- [docs/operator-guide.md](docs/operator-guide.md): operator and manager training guide (Bangla)
+- `deploy/booth/*.bat`, `deploy/central/deploy.sh`: installation scripts
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Code map
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Path | Purpose |
+|---|---|
+| `app/Services` | All business logic: tickets, shifts, rates, reports, sync, receipts, audit |
+| `app/Filament/Support`, `app/Filament/Actions` | Shared Filament columns, fields and actions (ticket overrides, shift open/close) |
+| `app/Filament/Pages/TollCollection.php` | Operator collection screen |
+| `app/Services/Sync/SyncRegistry.php` | What syncs, in which direction and in which order |
+| `app/Services/TransactionAggregates.php` | Single definition of the vehicles/revenue aggregates used by every report |
+| `config/toll.php` | Mode, booth code, sync and printer settings |

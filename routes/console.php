@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Enums\AppMode;
+use App\Support\Toll;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::command('toll:sync')
+    ->everyMinute()
+    ->withoutOverlapping(5)
+    ->when(fn (): bool => AppMode::isBooth() && Toll::syncEnabled());

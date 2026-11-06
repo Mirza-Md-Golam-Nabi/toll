@@ -2,31 +2,88 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
+use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasActiveScope;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+#[Fillable(['name', 'email', 'phone', 'password', 'role', 'booth_id', 'approval_pin', 'is_active', 'locale', 'last_login_at'])]
+#[Hidden(['password', 'remember_token', 'approval_pin'])]
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use Auditable, HasActiveScope, HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected array $auditExclude = ['last_login_at'];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'approval_pin' => 'hashed',
+            'role' => UserRole::class,
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function booth(): BelongsTo
+    {
+        return $this->belongsTo(Booth::class);
+    }
+
+    public function shiftSessions(): HasMany
+    {
+        return $this->hasMany(ShiftSession::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_active;
+    }
+
+    public function hasRole(UserRole ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
+
+    public function isAtLeast(UserRole $role): bool
+    {
+        return $this->role->isAtLeast($role);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
+    }
+
+    public function isOperator(): bool
+    {
+        return $this->role === UserRole::BoothOperator;
+    }
+
+    public function checkApprovalPin(string $pin): bool
+    {
+        return $this->approval_pin !== null && Hash::check($pin, $this->approval_pin);
+    }
+
+    /** Users allowed to approve manual overrides. */
+    public function scopeApprovers(Builder $query): Builder
+    {
+        return $query->active()
+            ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::PlazaManager->value])
+            ->whereNotNull('approval_pin');
     }
 }

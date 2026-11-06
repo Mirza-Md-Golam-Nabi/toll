@@ -1,7 +1,5 @@
 <?php
 
-it('returns a successful response', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
+it('redirects the home page to the admin panel', function () {
+    $this->get('/')->assertRedirect('/admin');
 });
