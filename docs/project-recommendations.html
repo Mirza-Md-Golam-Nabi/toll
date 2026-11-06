@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>টোল ম্যানেজমেন্ট পরামর্শ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1d2433;
+    --muted: #5b6475;
+    --primary: #1f3a68;
+    --primary-soft: #e6ecf6;
+    --border: #d9dfea;
+    --warn-bg: #fff6e0;
+    --warn-border: #e8b84a;
+    --ok: #1e7d4f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10141c;
+      --card: #181e29;
+      --text: #e4e8f0;
+      --muted: #9aa3b5;
+      --primary: #8fb0e8;
+      --primary-soft: #1f2a3d;
+      --border: #2c3546;
+      --warn-bg: #2e2614;
+      --warn-border: #a67c21;
+      --ok: #5cc995;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10141c;
+    --card: #181e29;
+    --text: #e4e8f0;
+    --muted: #9aa3b5;
+    --primary: #8fb0e8;
+    --primary-soft: #1f2a3d;
+    --border: #2c3546;
+    --warn-bg: #2e2614;
+    --warn-border: #a67c21;
+    --ok: #5cc995;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hind Siliguri", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { border-bottom: 3px solid var(--primary); padding-bottom: 16px; margin-bottom: 28px; }
+  header h1 { margin: 0; color: var(--primary); font-size: 1.9rem; line-height: 1.3; }
+  header p { margin: 6px 0 0; color: var(--muted); }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; font-size: .95rem; }
+  .meta span b { color: var(--text); }
+  section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  h2 { margin: 0 0 12px; color: var(--primary); font-size: 1.3rem; }
+  h3 { margin: 18px 0 8px; font-size: 1.08rem; }
+  ul, ol { padding-left: 1.3em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: .97rem; }
+  th, td { border: 1px solid var(--border); padding: 9px 11px; text-align: left; vertical-align: top; }
+  th { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+  td:first-child { white-space: nowrap; font-weight: 500; }
+  pre {
+    background: var(--primary-soft);
+    border-radius: 8px;
+    padding: 14px;
+    overflow-x: auto;
+    font-size: .88rem;
+    line-height: 1.5;
+    font-family: Consolas, "Courier New", monospace;
+  }
+  code { font-family: Consolas, "Courier New", monospace; font-size: .9em; background: var(--primary-soft); padding: 1px 5px; border-radius: 4px; }
+  pre code { background: none; padding: 0; }
+  .rec { border-left: 4px solid var(--ok); padding: 6px 12px; margin: 10px 0; background: var(--primary-soft); border-radius: 0 6px 6px 0; }
+  .rec b { color: var(--ok); }
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 12px 14px; margin-top: 14px; }
+  .checklist li::marker { content: "☐  "; }
+  footer { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 30px; }
+  @media print {
+    body { background: #fff; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>টোল ম্যানেজমেন্ট সফটওয়্যার: প্রজেক্ট পরামর্শ</h1>
+  <p>কোটেশন QT-001 অনুযায়ী আর্কিটেকচার, ব্যবসায়িক নিয়ম ও কাজের পরিকল্পনা</p>
+  <div class="meta">
+    <span><b>গ্রাহক:</b> Md. Zahidul Islam Biplob</span>
+    <span><b>সাইট:</b> সৈয়দ মাছ-উদ রুমী সেতু (১টি বুথ)</span>
+    <span><b>স্ট্যাক:</b> Laravel 13 · Filament · MySQL 8</span>
+  </div>
+</header>
+
+<section>
+  <h2>প্রজেক্টের সারসংক্ষেপ</h2>
+  <div class="table-scroll">
+  <table>
+    <tr><th>ফেজ</th><th>কাজ</th><th>বাজেট</th><th>সময়</th></tr>
+    <tr><td>ফেজ ১</td><td>পুরো সফটওয়্যার। নাম্বার প্লেট হাতে লেখা হবে, অথবা বাদ দেওয়া যাবে</td><td>৫০,০০০ টাকা</td><td>৬ সপ্তাহ</td></tr>
+    <tr><td>ফেজ ২</td><td>ANPR ক্যামেরা দিয়ে নাম্বার প্লেট স্বয়ংক্রিয়ভাবে ধরা</td><td>২৫,০০০ টাকা</td><td>৫ সপ্তাহ</td></tr>
+  </table>
+  </div>
+  <p>ফেজ ১-এর ডাটাবেজ এমনভাবে বানানো হবে যাতে ফেজ ২-এ বড় কোনো পরিবর্তন না লাগে। প্রতিটা ট্রানজেকশনে শুরু থেকেই এই ফিল্ডগুলো থাকবে (খালি থাকতে পারবে): <code>plate_number</code>, <code>plate_image</code>, <code>plate_source</code> (manual বা anpr), <code>anpr_confidence</code>।</p>
+</section>
+
+<section>
+  <h2>ক. অফলাইন আর্কিটেকচার</h2>
+  <div class="rec"><b>পরামর্শ:</b> বুথে একটা লোকাল সার্ভার থাকবে, আর একটা অনলাইন সেন্ট্রাল সার্ভার থাকবে।</div>
+<pre><code>[বুথ PC] Laravel + Filament + লোকাল MySQL   ← অপারেটর এখানে কাজ করবেন, ইন্টারনেট লাগবে না
+      │
+      │  প্রতি ১ মিনিটে অটো-সিঙ্ক (ইন্টারনেট থাকলে)
+      ▼
+[অনলাইন সার্ভার] Laravel + Filament + MySQL ← ম্যানেজার ও অ্যাডমিন যেকোনো জায়গা থেকে রিপোর্ট দেখবেন</code></pre>
+  <ul>
+    <li>বুথ PC-তে Laragon দিয়ে Laravel আর MySQL চলবে। অপারেটর <code>http://localhost</code> এ কাজ করবেন।</li>
+    <li>কোডবেস একটাই থাকবে। <code>.env</code>-এ শুধু <code>APP_MODE=booth</code> বা <code>central</code> বদলাতে হবে।</li>
+    <li>কোন দিকের ডাটা কে নিয়ন্ত্রণ করবে:
+      <ul>
+        <li>ট্রানজেকশন সবসময় বুথ থেকে সার্ভারে যাবে।</li>
+        <li>রেট, ক্যাটাগরি আর ইউজার সার্ভার থেকে বুথে আসবে।</li>
+        <li>ফলে দুই জায়গায় একই ডাটা আলাদাভাবে বদলে যাওয়ার ঝামেলা হবে না।</li>
+      </ul>
+    </li>
+    <li>সিঙ্ক যেন নিরাপদ হয়, সেজন্য:
+      <ul>
+        <li>প্রতিটা ট্রানজেকশনের আইডি হবে UUID।</li>
+        <li>টিকিটের সিরিয়াল নাম্বারে বুথ কোড থাকবে, যেমন <code>B01-261106-000123</code>।</li>
+        <li><code>synced_at</code> কলাম রাখা হবে।</li>
+        <li>সার্ভার একই ট্রানজেকশন দুইবার এলে দ্বিতীয়টা নেবে না।</li>
+      </ul>
+    </li>
+    <li>অনলাইন সার্ভার হিসেবে একটা সস্তা VPS বা cPanel হোস্টিং যথেষ্ট, মাসে আনুমানিক ৫০০–১০০০ টাকা। এর খরচ গ্রাহক দেবেন।</li>
+  </ul>
+</section>
+
+<section>
+  <h2>খ. ব্যবসায়িক নিয়ম</h2>
+  <div class="table-scroll">
+  <table>
+    <tr><th>বিষয়</th><th>পরামর্শ</th></tr>
+    <tr><td>১. ক্যাটাগরি ও রেট</td><td>সেতু কর্তৃপক্ষের অফিসিয়াল তালিকা গ্রাহকের কাছ থেকে নিতে হবে। ততদিন নমুনা ডাটা (seeder) দিয়ে কাজ চলবে। প্রতিটা ক্যাটাগরির জন্য কোড, বাংলা নাম, ইংরেজি নাম, শর্টকাট কী আর সাজানোর ক্রম থাকবে। রেটে <code>effective_from</code> তারিখ থাকবে, তাই রেট বদলালেও পুরনো রিপোর্টে আগের রেটই দেখাবে।</td></tr>
+    <tr><td>২. একমুখী নাকি দুইমুখী</td><td>প্রতিবার পার হলে একবার টোল। রিটার্ন টিকিট থাকবে না, কারণ এটা কোটেশনে নেই। শুধু একটা <code>direction</code> ফিল্ড রাখা হবে, পরে কাজে লাগলে ব্যবহার করা যাবে।</td></tr>
+    <tr><td>৩. ছাড়প্রাপ্ত গাড়ি</td><td>"Exempt" ক্যাটাগরি থাকবে। এতে ০ টাকার রসিদ প্রিন্ট হবে আর কারণ লিখতে হবে। প্রতিটা এন্ট্রি অডিট লগে যাবে, আর রিপোর্টে আলাদা করে দেখাবে।</td></tr>
+    <tr><td>৪. গাড়ি রেজিস্ট্রেশন</td><td>এর মানে প্রতিবার পার হওয়ার এন্ট্রি। এর বাইরে একটা ছোট <code>vehicles</code> টেবিল থাকবে, যাতে আগে দেখা নাম্বার প্লেট পরেরবার অটো-সাজেশনে আসে। ফেজ ২-এর ANPR-এও এটা কাজে লাগবে। মাসিক পাস কোটেশনে নেই, তাই বাদ।</td></tr>
+    <tr><td>৫. শিফট</td><td>৩টা শিফট: সকাল ৬টা–দুপুর ২টা, দুপুর ২টা–রাত ১০টা, রাত ১০টা–সকাল ৬টা। সময়গুলো সেটিংস থেকে বদলানো যাবে। নিয়ম: অপারেটর শিফট শুরু করবেন, শিফট শেষে ক্যাশ গুনে জমা দেবেন, আর সিস্টেম বেশি বা কম থাকলে দেখাবে। শিফট খোলা না থাকলে কোনো টিকিট কাটা যাবে না।</td></tr>
+    <tr><td>৬. ম্যানুয়াল ওভাররাইড</td><td>৩ ধরনের থাকবে: (ক) ভুল টিকিট বাতিল (void), (খ) ক্যাটাগরি সংশোধন, (গ) রসিদ আবার প্রিন্ট। বাতিল আর সংশোধনে কারণ লেখা বাধ্যতামূলক, আর ম্যানেজার PIN দিয়ে অনুমোদন দেবেন। আবার প্রিন্ট করলে রসিদে "DUPLICATE" লেখা থাকবে। কোনো ডাটা ডিলিট হবে না।</td></tr>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>গ. হার্ডওয়্যার</h2>
+  <div class="table-scroll">
+  <table>
+    <tr><th>বিষয়</th><th>পরামর্শ</th></tr>
+    <tr><td>৭. PC ও প্রিন্টার</td><td>Windows PC, আর USB থার্মাল প্রিন্টার (Xprinter বা Rongta জাতীয় সাধারণ ESC/POS মডেল)। প্রিন্টারটা Windows-এ shared printer হিসেবে সেট করে <code>escpos-php</code> দিয়ে সরাসরি প্রিন্ট হবে। ব্যাকআপ হিসেবে ব্রাউজার প্রিন্টের অপশনও থাকবে।</td></tr>
+    <tr><td>৮. ইন্টারনেট</td><td>মোবাইল ডাটা বা ব্রডব্যান্ড, যা পাওয়া যায়। ইন্টারনেট না থাকলেও সিস্টেম চলবে। ড্যাশবোর্ডে "Last synced: ১০ মিনিট আগে" দেখাবে।</td></tr>
+    <tr><td>৯. বুম ব্যারিয়ার</td><td>কোটেশনে নেই, তাই এখন করা হবে না। গ্রাহক চাইলে আলাদা চার্জে করা যাবে, এটা আগে থেকে জানিয়ে রাখা ভালো।</td></tr>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>ঘ. ইন্টারফেস ও রসিদ</h2>
+  <div class="table-scroll">
+  <table>
+    <tr><th>বিষয়</th><th>পরামর্শ</th></tr>
+    <tr><td>১০. ভাষা</td><td>অপারেটর স্ক্রিন আর রসিদ বাংলায়, অ্যাডমিন প্যানেল বাংলা ও ইংরেজি দুটোতেই (Laravel localization দিয়ে)।</td></tr>
+    <tr><td>রসিদের বিষয়বস্তু</td><td>সেতুর নাম, বুথ নাম্বার, টিকিট নাম্বার, তারিখ ও সময়, ক্যাটাগরি, নাম্বার প্লেট (থাকলে), টাকার পরিমাণ, অপারেটরের নাম, একটা QR কোড (টিকিট নাম্বার দিয়ে ভেরিফাই করার জন্য) আর "ধন্যবাদ" লাইন।</td></tr>
+    <tr><td>১১. নাম্বার প্লেট</td><td>ইংরেজি ফরম্যাটে সেভ হবে, যেমন <code>DHAKA METRO-GA 12-3456</code>, কারণ ANPR ক্যামেরা সাধারণত ইংরেজিতে আউটপুট দেয়। জেলা আর সিরিজ ড্রপডাউন থেকে বাছাই করা যাবে, বাকি নাম্বারগুলো টাইপ করতে হবে। চাইলে খালি রেখে দেওয়া যাবে।</td></tr>
+    <tr><td>অপারেটর স্ক্রিন</td><td>কাস্টম Filament Page। বড় বড় ক্যাটাগরি বাটন থাকবে, কিবোর্ডের এক চাপে কাজ হবে (যেমন <code>F1</code> চাপলে মোটরসাইকেল সিলেক্ট হবে, তারপর <code>Enter</code> চাপলে রসিদ প্রিন্ট হবে)। লক্ষ্য হলো প্রতিটা গাড়ি ২–৩ সেকেন্ডে ছাড়া।</td></tr>
+  </table>
+  </div>
+  <div class="warn">
+    <b>⚠️ বাংলা রসিদ নিয়ে সতর্কতা:</b> সাধারণ থার্মাল প্রিন্টার বাংলা ফন্ট সাপোর্ট করে না। তাই বাংলা লেখাটা ছবি বানিয়ে প্রিন্ট করতে হবে। এটা করা যায়, তবে একটু বেশি সময় লাগে। বিকল্প হলো রসিদ ইংরেজিতে প্রিন্ট করা আর শুধু সেতুর নাম বাংলায় লোগো-ছবি হিসেবে দেওয়া। <b>পরামর্শ: এই দ্বিতীয় বিকল্পটা।</b> এতে প্রিন্ট দ্রুত হয় আর ঝামেলা কম।
+  </div>
+</section>
+
+<section>
+  <h2>ঙ. টেকনিক্যাল স্ট্যাক</h2>
+  <div class="table-scroll">
+  <table>
+    <tr><th>প্যাকেজ</th><th>কাজ</th></tr>
+    <tr><td>Laravel 13 + Filament + MySQL 8</td><td>মূল ফ্রেমওয়ার্ক, অ্যাডমিন প্যানেল ও ডাটাবেজ</td></tr>
+    <tr><td>spatie/laravel-permission + filament-shield</td><td>রোল ও পারমিশন: Super Admin, Plaza Manager, Booth Operator</td></tr>
+    <tr><td>spatie/laravel-activitylog</td><td>অডিট ট্রেইল: আগের আর পরের মানসহ</td></tr>
+    <tr><td>mike42/escpos-php</td><td>58mm থার্মাল প্রিন্ট</td></tr>
+    <tr><td>maatwebsite/excel + barryvdh/laravel-dompdf</td><td>রিপোর্ট Excel ও PDF এক্সপোর্ট</td></tr>
+    <tr><td>Pest</td><td>টেস্ট: রেট হিসাব, সিঙ্ক আর শিফট ক্লোজিং</td></tr>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>চ. ৬ সপ্তাহের কাজের ক্রম (ফেজ ১)</h2>
+  <div class="table-scroll">
+  <table>
+    <tr><th>সপ্তাহ</th><th>কাজ</th></tr>
+    <tr><td>সপ্তাহ ১</td><td>ডাটাবেজ ডিজাইন, সেটআপ, রোল, ক্যাটাগরি ও রেট মডিউল</td></tr>
+    <tr><td>সপ্তাহ ২</td><td>অপারেটর স্ক্রিন, ট্রানজেকশন, শিফট</td></tr>
+    <tr><td>সপ্তাহ ৩</td><td>থার্মাল প্রিন্ট, অডিট ট্রেইল, ওভাররাইড</td></tr>
+    <tr><td>সপ্তাহ ৪</td><td>অফলাইন সিঙ্ক</td></tr>
+    <tr><td>সপ্তাহ ৫</td><td>রিপোর্ট আর ড্যাশবোর্ড</td></tr>
+    <tr><td>সপ্তাহ ৬</td><td>টেস্টিং, বুথে ডিপ্লয়মেন্ট, অপারেটর ট্রেনিং</td></tr>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>গ্রাহকের কাছ থেকে যা নিতে হবে</h2>
+  <ul class="checklist">
+    <li>অফিসিয়াল টোল রেটের তালিকা (ক্যাটাগরি অনুযায়ী)</li>
+    <li>থার্মাল প্রিন্টারের মডেল</li>
+    <li>শিফটের সময় ঠিক আছে কিনা তার নিশ্চয়তা</li>
+  </ul>
+</section>
+
+<footer>প্রতিটা সিদ্ধান্ত পরে সেটিংস থেকে বদলানো যাবে, এভাবেই সফটওয়্যার বানানো হবে।</footer>
+
+</div>
+</body>
+</html>
