@@ -5,20 +5,23 @@ namespace App\Models;
 use App\Enums\UserRole;
 use App\Models\Concerns\Auditable;
 use App\Models\Concerns\HasActiveScope;
+use App\Support\PhoneNumber;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'role', 'booth_id', 'approval_pin', 'is_active', 'locale', 'last_login_at'])]
+#[Fillable(['name', 'phone', 'email', 'password', 'role', 'booth_id', 'approval_pin', 'is_active', 'locale', 'last_login_at'])]
 #[Hidden(['password', 'remember_token', 'approval_pin'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -37,6 +40,36 @@ class User extends Authenticatable implements FilamentUser
             'role' => UserRole::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    /** A changed email address must be verified again before it receives reports. */
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            if ($user->isDirty('email') && ! $user->isDirty('email_verified_at')) {
+                $user->email_verified_at = null;
+            }
+        });
+    }
+
+    /** The login identity: always stored as 11 digits (01XXXXXXXXX). */
+    protected function phone(): Attribute
+    {
+        return Attribute::make(set: fn (?string $value): ?string => PhoneNumber::normalize($value));
+    }
+
+    /** Optional; used only to send reports. */
+    protected function email(): Attribute
+    {
+        return Attribute::make(set: fn (?string $value): ?string => filled($value) ? Str::lower(trim($value)) : null);
+    }
+
+    public function canReceiveReports(): bool
+    {
+        return $this->is_active
+            && $this->hasRole(UserRole::SuperAdmin, UserRole::PlazaManager)
+            && filled($this->email)
+            && $this->hasVerifiedEmail();
     }
 
     public function booth(): BelongsTo
@@ -85,5 +118,14 @@ class User extends Authenticatable implements FilamentUser
         return $query->active()
             ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::PlazaManager->value])
             ->whereNotNull('approval_pin');
+    }
+
+    /** Admins/managers who get emailed reports — never an unverified address. */
+    public function scopeReportRecipients(Builder $query): Builder
+    {
+        return $query->active()
+            ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::PlazaManager->value])
+            ->whereNotNull('email')
+            ->whereNotNull('email_verified_at');
     }
 }

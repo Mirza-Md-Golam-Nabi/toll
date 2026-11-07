@@ -8,12 +8,12 @@ use Database\Seeders\DatabaseSeeder;
 it('creates a super admin with an approval PIN', function () {
     $this->artisan('toll:create-admin', [
         '--name' => 'Owner',
-        '--email' => 'owner@example.com',
+        '--phone' => '+8801912345678',
         '--password' => 'secret-pass',
         '--pin' => '2468',
     ])->assertSuccessful();
 
-    $user = User::query()->where('email', 'owner@example.com')->sole();
+    $user = User::query()->where('phone', '01912345678')->sole();
 
     expect($user->role)->toBe(UserRole::SuperAdmin)
         ->and($user->checkApprovalPin('2468'))->toBeTrue();
@@ -22,7 +22,7 @@ it('creates a super admin with an approval PIN', function () {
 it('rejects weak input', function () {
     $this->artisan('toll:create-admin', [
         '--name' => 'Owner',
-        '--email' => 'not-an-email',
+        '--phone' => '12345',
         '--password' => 'short',
         '--pin' => '12',
     ])->assertFailed();
@@ -32,7 +32,7 @@ it('rejects weak input', function () {
 
 it('seeds demo accounts only outside production', function () {
     $this->seed();
-    expect(User::query()->where('email', 'admin@toll.test')->exists())->toBeTrue();
+    expect(User::query()->where('phone', '01700000001')->exists())->toBeTrue();
 
     User::query()->delete();
     app()->detectEnvironment(fn () => 'production');

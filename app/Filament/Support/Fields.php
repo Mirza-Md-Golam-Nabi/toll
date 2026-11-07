@@ -2,9 +2,11 @@
 
 namespace App\Filament\Support;
 
+use App\Rules\BangladeshMobileNumber;
 use App\Services\ApprovalService;
 use App\Services\RateService;
 use App\Support\Money;
+use App\Support\PhoneNumber;
 use App\Support\Settings;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -29,6 +31,18 @@ final class Fields
     public static function active(): Toggle
     {
         return Toggle::make('is_active')->label('Active')->default(true);
+    }
+
+    /** 11-digit Bangladeshi mobile number; validated in its normalised form (+880 / Bangla digits accepted). */
+    public static function mobileNumber(string $name = 'phone'): TextInput
+    {
+        return TextInput::make($name)
+            ->label('Mobile number')
+            ->tel()
+            ->placeholder('01XXXXXXXXX')
+            ->required()
+            ->mutateStateForValidationUsing(fn (?string $state): ?string => PhoneNumber::normalize($state))
+            ->rule(new BangladeshMobileNumber);
     }
 
     public static function sortOrder(): TextInput

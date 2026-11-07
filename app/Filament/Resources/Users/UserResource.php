@@ -41,8 +41,9 @@ class UserResource extends Resource
             ->columns(2)
             ->components([
                 TextInput::make('name')->label('Name')->required()->maxLength(255),
-                TextInput::make('email')->label('Email')->email()->required()->unique(ignoreRecord: true),
-                TextInput::make('phone')->label('Phone')->tel()->maxLength(20),
+                Fields::mobileNumber()->unique(ignoreRecord: true),
+                TextInput::make('email')->label('Email')->email()->nullable()->maxLength(255)->unique(ignoreRecord: true)
+                    ->helperText(__('Optional. Reports are sent only after the user verifies it from their profile.')),
                 Select::make('role')->label('Role')->options(UserRole::class)->required()->live()->native(false),
                 Select::make('booth_id')->label('Booth')->relationship('booth', 'name')->preload()->native(false),
                 Select::make('locale')->label('Language')->options(['bn' => 'বাংলা', 'en' => 'English'])->default('bn')->required()->native(false),
@@ -72,9 +73,12 @@ class UserResource extends Resource
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with('booth:id,code'))
             ->columns([
-                TextColumn::make('name')->label('Name')->searchable()->weight('semibold')
-                    ->description(fn (User $record): ?string => $record->phone),
-                TextColumn::make('email')->label('Email')->searchable()->copyable(),
+                TextColumn::make('name')->label('Name')->searchable()->weight('semibold'),
+                TextColumn::make('phone')->label('Mobile number')->searchable()->copyable()->placeholder('—'),
+                TextColumn::make('email')->label('Email')->searchable()->placeholder('—')
+                    ->icon(fn (User $record): Heroicon => $record->hasVerifiedEmail() ? Heroicon::OutlinedCheckBadge : Heroicon::OutlinedExclamationTriangle)
+                    ->iconColor(fn (User $record): string => $record->hasVerifiedEmail() ? 'success' : 'warning')
+                    ->tooltip(fn (User $record): ?string => $record->email ? __($record->hasVerifiedEmail() ? 'Verified' : 'Not verified') : null),
                 Columns::badge('role', 'Role'),
                 TextColumn::make('booth.code')->label('Booth')->badge()->color('gray')->placeholder('—'),
                 Columns::active(),

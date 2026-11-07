@@ -104,13 +104,13 @@ class DatabaseSeeder extends Seeder
     private function seedUsers(Booth $booth): void
     {
         $users = [
-            ['Super Admin', 'admin@toll.test', UserRole::SuperAdmin, '1234'],
-            ['Plaza Manager', 'manager@toll.test', UserRole::PlazaManager, '4321'],
-            ['Booth Operator', 'operator@toll.test', UserRole::BoothOperator, null],
+            ['Super Admin', '01700000001', UserRole::SuperAdmin, '1234'],
+            ['Plaza Manager', '01700000002', UserRole::PlazaManager, '4321'],
+            ['Booth Operator', '01700000003', UserRole::BoothOperator, null],
         ];
 
-        foreach ($users as [$name, $email, $role, $pin]) {
-            User::query()->updateOrCreate(['email' => $email], [
+        foreach ($users as [$name, $phone, $role, $pin]) {
+            User::query()->updateOrCreate(['phone' => $phone], [
                 'name' => $name,
                 'password' => 'password',
                 'role' => $role,
@@ -118,7 +118,6 @@ class DatabaseSeeder extends Seeder
                 'approval_pin' => $pin,
                 'is_active' => true,
                 'locale' => 'bn',
-                'email_verified_at' => now(),
             ]);
         }
     }

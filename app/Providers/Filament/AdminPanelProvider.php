@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Enums\NavigationGroup;
+use App\Filament\Auth\EditProfile;
+use App\Filament\Auth\Login;
 use App\Http\Middleware\SetLocale;
 use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
@@ -30,7 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(Login::class)
+            ->profile(EditProfile::class, isSimple: false)
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2.75rem')
             ->favicon(asset('favicon.svg'))
@@ -47,6 +50,15 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups(NavigationGroup::class)
             ->userMenuItems([
+                'profile' => fn (Action $action): Action => $action
+                    ->label(auth()->user()->name)
+                    ->icon(Heroicon::OutlinedUserCircle),
+                Action::make('verifyEmail')
+                    ->label(__('Verify email'))
+                    ->icon(Heroicon::OutlinedExclamationTriangle)
+                    ->color('warning')
+                    ->url(fn (): string => EditProfile::getUrl())
+                    ->visible(fn (): bool => filled(auth()->user()?->email) && ! auth()->user()->hasVerifiedEmail()),
                 Action::make('switchLanguage')
                     ->label(fn () => app()->getLocale() === 'bn' ? 'English' : 'বাংলা')
                     ->icon(Heroicon::OutlinedLanguage)

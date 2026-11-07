@@ -29,11 +29,11 @@ php artisan serve --port=8010
 
 Open http://127.0.0.1:8010/admin. Demo accounts (local only, password `password`):
 
-| Role | Email | Approval PIN |
+| Role | Mobile number | Approval PIN |
 |---|---|---|
-| Super Admin | admin@toll.test | 1234 |
-| Plaza Manager | manager@toll.test | 4321 |
-| Booth Operator | operator@toll.test | — |
+| Super Admin | 01700000001 | 1234 |
+| Plaza Manager | 01700000002 | 4321 |
+| Booth Operator | 01700000003 | — |
 
 Tests run against the MySQL database `toll_management_test`:
 
