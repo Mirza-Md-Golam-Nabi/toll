@@ -109,9 +109,7 @@ php artisan test --compact
 2. Clone the project and go to the folder
 
 ```sh
-cd /var/www
-git clone <repository-url> toll-management
-cd toll-management
+git clone https://github.com/Mirza-Md-Golam-Nabi/toll.git .
 ```
 
 3. Create a MySQL database and a user for it.
@@ -157,7 +155,7 @@ It installs dependencies, generates the key, migrates, seeds, publishes assets, 
 1. Clone into the folder that will serve the site:
 
 ```sh
-git clone <repository-url> .
+git clone https://github.com/Mirza-Md-Golam-Nabi/toll.git .
 ```
 
 If the domain's document root cannot point to the `public` folder, set it from **cPanel → Domains** to `<project-folder>/public`.
@@ -179,7 +177,7 @@ alias php="/opt/cpanel/ea-php83/root/usr/bin/php"
 4. Create the database and its user from **cPanel → MySQL® Databases**, then create `.env`:
 
 ```sh
-cp deploy/central/.env.central.example .env
+cp .env.example .env
 ```
 
 Fill in `APP_URL`, the `DB_*` values, `TOLL_SYNC_TOKEN` and the `MAIL_*` values as in the VPS steps above.
