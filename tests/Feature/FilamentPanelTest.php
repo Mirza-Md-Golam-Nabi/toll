@@ -1,20 +1,25 @@
 <?php
 
+use App\Enums\Permission;
+use App\Enums\UserRole;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Reports;
 use App\Filament\Pages\Settings;
 use App\Filament\Pages\TollCollection;
 use App\Filament\Resources\AuditLogs\AuditLogResource;
 use App\Filament\Resources\Booths\BoothResource;
+use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Shifts\ShiftResource;
 use App\Filament\Resources\ShiftSessions\ShiftSessionResource;
 use App\Filament\Resources\TollTransactions\TollTransactionResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Resources\VehicleCategories\VehicleCategoryResource;
 use App\Filament\Resources\Vehicles\VehicleResource;
+use App\Models\Role;
 use App\Models\TollTransaction;
 use App\Models\User;
 use App\Models\VehicleCategory;
+use App\Services\RolePermissionService;
 use App\Services\TollTransactionService;
 use Livewire\Livewire;
 
@@ -46,6 +51,8 @@ it('renders every resource and page for a super admin without N+1 queries', func
     'shifts' => fn () => ShiftResource::getUrl(),
     'booths' => fn () => BoothResource::getUrl(),
     'users' => fn () => UserResource::getUrl(),
+    'roles' => fn () => RoleResource::getUrl(),
+    'role edit' => fn () => RoleResource::getUrl('edit', ['record' => Role::findByName(UserRole::PlazaManager->value)]),
     'audit logs' => fn () => AuditLogResource::getUrl(),
 ]);
 
@@ -77,4 +84,30 @@ it('shows the browser receipt to its operator', function () {
         ->get(route('receipts.print', $ticket))
         ->assertOk()
         ->assertSee($ticket->ticket_no);
+});
+
+it('lets the super admin choose which roles see the ticket and shift session menus', function () {
+    $ticket = TollTransaction::query()->first();
+    $this->actingAs($this->setup->operator);
+
+    expect(TollTransactionResource::canAccess())->toBeTrue()
+        ->and(ShiftSessionResource::canAccess())->toBeTrue();
+
+    app(RolePermissionService::class)->update(UserRole::BoothOperator, [Permission::CollectToll]);
+    $this->actingAs($this->setup->operator->fresh());
+
+    expect(TollTransactionResource::canAccess())->toBeFalse()
+        ->and(ShiftSessionResource::canAccess())->toBeFalse();
+
+    $this->get(TollTransactionResource::getUrl())->assertForbidden();
+    $this->get(TollTransactionResource::getUrl('view', ['record' => $ticket]))->assertForbidden();
+    $this->get(ShiftSessionResource::getUrl())->assertForbidden();
+
+    $this->get(route('receipts.print', $ticket))->assertOk();
+
+    Livewire::test(TollCollection::class)
+        ->callAction('closeShift', data: ['declared_cash' => 250])
+        ->assertHasNoActionErrors();
+
+    expect($ticket->shiftSession->fresh()->isOpen())->toBeFalse();
 });

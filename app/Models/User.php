@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\Permission;
 use App\Enums\UserRole;
 use App\Models\Concerns\Auditable;
 use App\Models\Concerns\HasActiveScope;
+use App\Services\RolePermissionService;
 use App\Support\PhoneNumber;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -27,6 +29,9 @@ class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use Auditable, HasActiveScope, HasFactory, Notifiable;
+
+    /** Login PIN given to new accounts; stored hashed in the `password` column. */
+    public const DEFAULT_PIN = '1234';
 
     protected array $auditExclude = ['last_login_at'];
 
@@ -67,7 +72,7 @@ class User extends Authenticatable implements FilamentUser
     public function canReceiveReports(): bool
     {
         return $this->is_active
-            && $this->hasRole(UserRole::SuperAdmin, UserRole::PlazaManager)
+            && $this->hasPermission(Permission::ViewReports)
             && filled($this->email)
             && $this->hasVerifiedEmail();
     }
@@ -92,9 +97,9 @@ class User extends Authenticatable implements FilamentUser
         return in_array($this->role, $roles, true);
     }
 
-    public function isAtLeast(UserRole $role): bool
+    public function hasPermission(Permission $permission): bool
     {
-        return $this->role->isAtLeast($role);
+        return $this->role->hasPermission($permission);
     }
 
     public function isSuperAdmin(): bool
@@ -102,29 +107,32 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === UserRole::SuperAdmin;
     }
 
-    public function isOperator(): bool
-    {
-        return $this->role === UserRole::BoothOperator;
-    }
-
     public function checkApprovalPin(string $pin): bool
     {
         return $this->approval_pin !== null && Hash::check($pin, $this->approval_pin);
+    }
+
+    /** Users whose role holds the given permission. */
+    public function scopeWithPermission(Builder $query, Permission $permission): Builder
+    {
+        $roles = app(RolePermissionService::class)->rolesWith($permission);
+
+        return $query->whereIn('role', array_map(fn (UserRole $role): string => $role->value, $roles));
     }
 
     /** Users allowed to approve manual overrides. */
     public function scopeApprovers(Builder $query): Builder
     {
         return $query->active()
-            ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::PlazaManager->value])
+            ->withPermission(Permission::ApproveOverrides)
             ->whereNotNull('approval_pin');
     }
 
-    /** Admins/managers who get emailed reports — never an unverified address. */
+    /** Users who get emailed reports — never an unverified address. */
     public function scopeReportRecipients(Builder $query): Builder
     {
         return $query->active()
-            ->whereIn('role', [UserRole::SuperAdmin->value, UserRole::PlazaManager->value])
+            ->withPermission(Permission::ViewReports)
             ->whereNotNull('email')
             ->whereNotNull('email_verified_at');
     }

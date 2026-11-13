@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\AppMode;
 use App\Enums\NavigationGroup;
+use App\Enums\Permission;
 use App\Enums\PlateSource;
 use App\Filament\Actions\ShiftActions;
 use App\Filament\Support\Feedback;
@@ -19,6 +20,7 @@ use App\Services\TollTransactionService;
 use App\Services\TransactionAggregates;
 use App\Support\Money;
 use App\Support\PlateNumber;
+use App\Support\Toll;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -50,7 +52,7 @@ class TollCollection extends Page
 
     public static function canAccess(): bool
     {
-        return AppMode::isBooth();
+        return AppMode::isBooth() && Toll::userCan(Permission::CollectToll);
     }
 
     public static function getNavigationLabel(): string
@@ -74,6 +76,13 @@ class TollCollection extends Page
     public function categories(): Collection
     {
         return app(RateService::class)->activeCategories();
+    }
+
+    /** Whether the shift summary cards (shift, vehicles, collected cash, booth) are shown. */
+    #[Computed]
+    public function canViewShiftSummary(): bool
+    {
+        return Toll::userCan(Permission::ViewShiftSummary);
     }
 
     #[Computed]

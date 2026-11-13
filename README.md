@@ -10,6 +10,7 @@ Built with Laravel 13, Filament 5 and MySQL 8.
 - **Shifts**: opening cash at the start, then cash declaration and reconciliation at close.
 - **Receipts**: 58mm thermal printing over ESC/POS, with a browser-print fallback. Reprints are marked DUPLICATE.
 - **Offline first**: each booth runs on its own local database and syncs with the central server every minute.
+- **Android phones**: an installable offline app (`/mobile/app`) for collecting on phones. Tickets are saved on the phone and sync to the central server when internet returns. Receipts print on a Bluetooth 58mm printer.
 - **Audit trail**: logs every login, shift, ticket and override. Voids and category corrections need a manager PIN.
 - **Roles**: Super Admin, Plaza Manager and Booth Operator.
 - **Reports**: daily, shift-wise, category-wise and operator-wise collection, with CSV export and print. The dashboard shows charts.
@@ -32,7 +33,9 @@ The same code runs in two modes, set with `TOLL_MODE` in `.env`:
 | Mode | Where | Purpose |
 |---|---|---|
 | `booth` | Windows PC at the toll booth | Operators issue tickets; works without internet |
-| `central` | Online server (VPS / cPanel) | Collects data from every booth; managers see reports from anywhere |
+| `central` | Online server (VPS / cPanel) | Collects data from every booth and phone; managers see reports from anywhere |
+
+Android phones need no installation on a PC: they open the app from the central server (see step 5).
 
 A central server is optional. Without one, a booth runs stand-alone.
 
@@ -226,6 +229,30 @@ On a booth connected to central, users come from the server, so press Ctrl+C at 
 
 Printer setup, opcache and other details: [docs/deployment.md](docs/deployment.md).
 
+### 5. Android phones (offline app)
+
+Phones connect to the **central server**, so finish step 2 or 3 first. The site must use **HTTPS**: Android only installs the app and allows Bluetooth over HTTPS.
+
+1. In the panel, make sure every operator has a **Booth** set (**Configuration → Users**).
+2. On the phone, open **Chrome** and go to `https://<your-domain>/mobile/app`.
+3. Sign in with the operator's mobile number and PIN. The first sign in needs internet. The phone registers itself and gets a code (`M1`, `M2`, ...) for its booth.
+4. Chrome menu → **Add to Home screen / Install app**. From now on, open it from the home screen icon.
+5. Printer: in the app go to **Settings → Printer**:
+   - **RawBT app** (recommended, works with most Bluetooth 58mm printers): install "RawBT" from the Play Store and pair the printer in it once.
+   - **Direct Bluetooth**: only for BLE printers; tap "Connect printer" once.
+6. Tap **Test print**.
+
+How it works:
+
+- Shifts and tickets are saved on the phone first, so collection never stops without internet. The app syncs every 30 seconds when online. The pill at the top shows online/offline and how many records are waiting.
+- Each phone numbers its own tickets: `B01-M2-261112-000123` (booth, phone, date, serial). Several phones can work on the same booth at the same time.
+- The server recalculates expected cash for each shift from the synced tickets.
+- Managers see all phones under **Configuration → Mobile Devices** and can **block** a lost phone. A blocked phone is signed out at once and its token stops working.
+- Voids and category corrections still need a manager, so they are done from the web panel.
+- Sign out is allowed only after the shift is closed and everything is synced.
+
+After changing files in `public/mobile`, bump `VERSION` in `app/Support/MobileApp.php` and `CACHE_VERSION` in `public/mobile/sw.js`, so phones download the new version.
+
 ### After changing `.env` or updating the code
 
 ```sh
@@ -239,7 +266,7 @@ On a VPS, `bash deploy/central/deploy.sh` does all of this.
 
 ## 🔑 Default Login Credentials
 
-Users log in with their **mobile number**. On a local machine (`APP_ENV=local`), the seeder creates these demo accounts with the password `password`:
+Users log in with their **mobile number** and a **4-5 digit PIN**. On a local machine (`APP_ENV=local`), the seeder creates these demo accounts with the login PIN `1234`:
 
 | Role | Mobile number | Approval PIN |
 |---|---|---|
@@ -247,14 +274,14 @@ Users log in with their **mobile number**. On a local machine (`APP_ENV=local`),
 | Plaza Manager | 01700000002 | 4321 |
 | Booth Operator | 01700000003 | — |
 
-> ⚠️ Demo accounts are never created on a production server or booth. There, create the first Super Admin with `php artisan toll:create-admin`. The same command resets a forgotten password.
+> ⚠️ Demo accounts are never created on a production server or booth. There, create the first Super Admin with `php artisan toll:create-admin`. The same command resets a forgotten PIN.
 
 ## Useful commands
 
 | Task | Command |
 |---|---|
 | Sync a booth with central manually | `php artisan toll:sync` |
-| Create a Super Admin / reset a password | `php artisan toll:create-admin` |
+| Create a Super Admin / reset a login PIN | `php artisan toll:create-admin` |
 | Rebuild caches after `.env` changes | `php artisan optimize` |
 | Back up the database | `mysqldump -uroot toll_management > backup.sql` |
 
@@ -274,3 +301,4 @@ Users log in with their **mobile number**. On a local machine (`APP_ENV=local`),
 | `app/Services/Sync/SyncRegistry.php` | What syncs, in which direction and in which order |
 | `app/Services/TransactionAggregates.php` | Single definition of the vehicles/revenue aggregates used by every report |
 | `config/toll.php` | Mode, booth code, sync and printer settings |
+| `app/Services/Mobile`, `public/mobile` | Android offline app: API services and the app itself (PWA) |

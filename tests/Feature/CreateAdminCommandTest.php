@@ -9,7 +9,7 @@ it('creates a super admin with an approval PIN', function () {
     $this->artisan('toll:create-admin', [
         '--name' => 'Owner',
         '--phone' => '+8801912345678',
-        '--password' => 'secret-pass',
+        '--login-pin' => '5678',
         '--pin' => '2468',
     ])->assertSuccessful();
 
@@ -23,7 +23,7 @@ it('rejects weak input', function () {
     $this->artisan('toll:create-admin', [
         '--name' => 'Owner',
         '--phone' => '12345',
-        '--password' => 'short',
+        '--login-pin' => '12',
         '--pin' => '12',
     ])->assertFailed();
 

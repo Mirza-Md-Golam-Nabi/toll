@@ -45,7 +45,16 @@ class VehicleRegistry
             'vehicle_category_id',
             'last_seen_at',
             'updated_at',
-            'pass_count' => DB::raw('pass_count + VALUES(pass_count)'),
+            'pass_count' => DB::raw($this->incrementedPassCount()),
         ]);
+    }
+
+    /** Adds the incoming pass count to the stored one; the UPSERT syntax differs per database driver. */
+    private function incrementedPassCount(): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'mysql', 'mariadb' => 'pass_count + VALUES(pass_count)',
+            default => 'vehicles.pass_count + excluded.pass_count',
+        };
     }
 }

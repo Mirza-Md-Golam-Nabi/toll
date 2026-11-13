@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\AppMode;
 use App\Enums\NavigationGroup;
-use App\Enums\UserRole;
+use App\Enums\Permission;
 use App\Filament\Support\Feedback;
 use App\Models\Booth;
 use App\Models\TollTransaction;
@@ -40,7 +40,7 @@ class Settings extends Page
 
     public static function canAccess(): bool
     {
-        return Toll::userIsAtLeast(UserRole::SuperAdmin);
+        return Toll::userCan(Permission::ManageSettings);
     }
 
     public static function getNavigationLabel(): string

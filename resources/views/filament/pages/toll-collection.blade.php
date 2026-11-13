@@ -1,7 +1,6 @@
 <x-filament-panels::page>
     @php
         $session = $this->session;
-        $summary = $this->summary;
     @endphp
 
     <div
@@ -25,16 +24,19 @@
         x-on:toll-ticket-issued.window="$refs.plate?.focus()"
     >
         {{-- Shift status strip --}}
-        <section class="tl-stats">
-            <x-stat-card color="teal" :label="__('Shift')" :value="$session?->shift->name ?? __('No open shift')"
-                :hint="$session ? __('Opened at').' '.$session->opened_at->format('h:i A') : __('Open a shift to start collecting')" />
-            <x-stat-card color="indigo" :label="__('Vehicles')" :value="number_format($summary['vehicles'])"
-                :hint="__('Exempt').': '.$summary['exempt_count'].' · '.__('Voided').': '.$summary['voided_count']" />
-            <x-stat-card color="amber" :label="__('Collected this shift')" :value="\App\Support\Money::format($summary['revenue'])"
-                :hint="__('Opening cash').': '.\App\Support\Money::format($session?->opening_cash)" />
-            <x-stat-card color="rose" :label="__('Booth')" :value="$session?->booth->code ?? config('toll.booth_code')"
-                :hint="auth()->user()->name" />
-        </section>
+        @if ($this->canViewShiftSummary)
+            @php($summary = $this->summary)
+            <section class="tl-stats">
+                <x-stat-card color="teal" :label="__('Shift')" :value="$session?->shift->name ?? __('No open shift')"
+                    :hint="$session ? __('Opened at').' '.$session->opened_at->format('h:i A') : __('Open a shift to start collecting')" />
+                <x-stat-card color="indigo" :label="__('Vehicles')" :value="number_format($summary['vehicles'])"
+                    :hint="__('Exempt').': '.$summary['exempt_count'].' · '.__('Voided').': '.$summary['voided_count']" />
+                <x-stat-card color="amber" :label="__('Collected this shift')" :value="\App\Support\Money::format($summary['revenue'])"
+                    :hint="__('Opening cash').': '.\App\Support\Money::format($session?->opening_cash)" />
+                <x-stat-card color="rose" :label="__('Booth')" :value="$session?->booth->code ?? config('toll.booth_code')"
+                    :hint="auth()->user()->name" />
+            </section>
+        @endif
 
         <div class="tl-layout">
             {{-- Category tiles --}}
@@ -60,7 +62,9 @@
                             @endif
                             <span class="tl-tile__icon">{{ $category->icon ?: '🚘' }}</span>
                             <span class="tl-tile__name">{{ $category->name_bn }}</span>
-                            <span class="tl-tile__sub">{{ $category->name_en }}</span>
+                            @if ($category->name_en)
+                                <span class="tl-tile__sub">{{ $category->name_en }}</span>
+                            @endif
                             <span class="tl-tile__amount">
                                 {{ $category->is_exempt ? __('Free') : \App\Support\Money::format($category->current_amount) }}
                             </span>

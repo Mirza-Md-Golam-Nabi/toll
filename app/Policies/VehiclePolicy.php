@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Permission;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,6 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class VehiclePolicy extends MasterDataPolicy
 {
+    protected Permission $viewPermission = Permission::ViewVehicles;
+
+    protected Permission $managePermission = Permission::UpdateVehicles;
+
     public function create(User $user): bool
     {
         return false;
@@ -17,7 +22,7 @@ class VehiclePolicy extends MasterDataPolicy
 
     public function update(User $user, Model $model): bool
     {
-        return $this->viewAny($user);
+        return $user->hasPermission($this->managePermission);
     }
 
     public function delete(User $user, Model $model): bool

@@ -36,7 +36,7 @@ final readonly class ReceiptData
             ['Ticket', $transaction->ticket_no],
             ['Date', $transaction->issued_at->format('d/m/Y h:i:s A')],
             ['Booth', $transaction->booth->code.' - '.$transaction->booth->name],
-            ['Vehicle', $transaction->category->name_en],
+            ['Vehicle', $transaction->category->english_name],
             $transaction->plate_number ? ['Plate', $transaction->plate_number] : null,
             ['Operator', $transaction->operator->name],
             $transaction->status === TransactionStatus::Exempt ? ['Exempt', (string) $transaction->exempt_reason] : null,

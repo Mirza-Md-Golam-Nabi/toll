@@ -2,4 +2,11 @@
 
 namespace App\Policies;
 
-class ShiftPolicy extends MasterDataPolicy {}
+use App\Enums\Permission;
+
+class ShiftPolicy extends MasterDataPolicy
+{
+    protected Permission $viewPermission = Permission::ViewShifts;
+
+    protected Permission $managePermission = Permission::ManageShifts;
+}

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'booth_id', 'shift_id', 'user_id', 'status', 'opened_at', 'closed_at', 'opening_cash',
+    'booth_id', 'shift_id', 'user_id', 'mobile_device_id', 'status', 'opened_at', 'closed_at', 'opening_cash',
     'expected_cash', 'declared_cash', 'cash_difference', 'transaction_count', 'notes', 'synced_at',
 ])]
 class ShiftSession extends Model
@@ -47,6 +47,11 @@ class ShiftSession extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mobileDevice(): BelongsTo
+    {
+        return $this->belongsTo(MobileDevice::class);
     }
 
     public function transactions(): HasMany

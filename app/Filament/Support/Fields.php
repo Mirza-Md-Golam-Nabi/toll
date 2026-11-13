@@ -2,6 +2,7 @@
 
 namespace App\Filament\Support;
 
+use App\Models\Concerns\HasSortOrder;
 use App\Rules\BangladeshMobileNumber;
 use App\Services\ApprovalService;
 use App\Services\RateService;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Reusable form fields shared by resources, page actions and override modals.
@@ -45,9 +47,32 @@ final class Fields
             ->rule(new BangladeshMobileNumber);
     }
 
-    public static function sortOrder(): TextInput
+    /** 4-5 digit login PIN, kept (hashed) in the `password` column. */
+    public static function loginPin(string $label = 'PIN'): TextInput
     {
-        return TextInput::make('sort_order')->label('Sort order')->numeric()->default(0)->minValue(0);
+        return TextInput::make('password')
+            ->label($label)
+            ->validationAttribute(__($label))
+            ->inputMode('numeric')
+            ->minLength(4)
+            ->maxLength(5)
+            ->rule('digits_between:4,5');
+    }
+
+    /**
+     * Position in a gap-free sequence; defaults to the next free position on create.
+     *
+     * @param  class-string<Model>  $model  A model using {@see HasSortOrder}.
+     */
+    public static function sortOrder(string $model): TextInput
+    {
+        return TextInput::make('sort_order')
+            ->label('Sort order')
+            ->integer()
+            ->required()
+            ->minValue(1)
+            ->default(fn (): int => $model::nextSortOrder())
+            ->helperText(__('Items at this position and after it move down by one.'));
     }
 
     public static function reason(string $name = 'reason', string $label = 'Reason'): Textarea

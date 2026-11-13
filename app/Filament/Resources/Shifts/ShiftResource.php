@@ -39,7 +39,7 @@ class ShiftResource extends Resource
                 TextInput::make('name')->label('Name')->required()->maxLength(255),
                 TimePicker::make('start_time')->label('Start time')->seconds(false)->required(),
                 TimePicker::make('end_time')->label('End time')->seconds(false)->required(),
-                Fields::sortOrder(),
+                Fields::sortOrder(Shift::class),
                 Fields::active(),
             ]);
     }

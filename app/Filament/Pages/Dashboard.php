@@ -2,18 +2,23 @@
 
 namespace App\Filament\Pages;
 
-use App\Enums\AppMode;
+use App\Enums\Permission;
 use App\Support\Toll;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    /** Operators land straight on the collection screen. */
+    /** Users with nothing to see on the dashboard land straight on the collection screen. */
     public function mount(): void
     {
-        if (Toll::user()?->isOperator() && AppMode::isBooth()) {
+        if (! $this->showsAnyWidget() && TollCollection::canAccess()) {
             $this->redirect(TollCollection::getUrl(), navigate: true);
         }
+    }
+
+    private function showsAnyWidget(): bool
+    {
+        return Toll::userCan(Permission::ViewCollectionSummary) || Toll::userCan(Permission::ViewDashboardStats);
     }
 
     public function getTitle(): string

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditable;
 use App\Models\Concerns\HasActiveScope;
+use App\Models\Concerns\HasSortOrder;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name', 'start_time', 'end_time', 'sort_order', 'is_active'])]
 class Shift extends Model
 {
-    use Auditable, HasActiveScope, HasFactory;
+    use Auditable, HasActiveScope, HasFactory, HasSortOrder;
 
     protected function casts(): array
     {

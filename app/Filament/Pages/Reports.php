@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\AppMode;
 use App\Enums\NavigationGroup;
+use App\Enums\Permission;
 use App\Enums\UserRole;
 use App\Models\Booth;
 use App\Models\Shift;
@@ -42,7 +43,7 @@ class Reports extends Page
 
     public static function canAccess(): bool
     {
-        return Toll::userIsAtLeast(UserRole::PlazaManager);
+        return Toll::userCan(Permission::ViewReports);
     }
 
     public static function getNavigationLabel(): string
@@ -79,7 +80,7 @@ class Reports extends Page
                 Select::make('user_id')->label('Operator')->live()->searchable()
                     ->options(fn () => User::query()->where('role', UserRole::BoothOperator)->orderBy('name')->pluck('name', 'id')),
                 Select::make('vehicle_category_id')->label('Vehicle category')->live()
-                    ->options(fn () => VehicleCategory::query()->ordered()->pluck('name_en', 'id')),
+                    ->options(fn (): array => VehicleCategory::options()),
             ]);
     }
 

@@ -4,6 +4,7 @@ namespace App\Services\Sync;
 
 use App\Models\Booth;
 use App\Models\TollTransaction;
+use App\Services\RolePermissionService;
 use App\Services\VehicleRegistry;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -13,7 +14,10 @@ use InvalidArgumentException;
  */
 class SyncIngestService
 {
-    public function __construct(private VehicleRegistry $vehicles) {}
+    public function __construct(
+        private VehicleRegistry $vehicles,
+        private RolePermissionService $rolePermissions,
+    ) {}
 
     public function ingest(Booth $booth, string $table, array $records): int
     {
@@ -35,11 +39,12 @@ class SyncIngestService
         return count($rows);
     }
 
-    /** @return array<string, array<int, array>> table => raw rows (incl. hashed secrets) */
+    /** @return array<string, array> table => raw rows (incl. hashed secrets), plus role => permission names */
     public function masterData(): array
     {
         return collect(SyncRegistry::PULL)
             ->map(fn (string $modelClass) => $modelClass::query()->toBase()->get()->map(fn ($row) => (array) $row)->all())
+            ->put(SyncRegistry::ROLE_PERMISSIONS, $this->rolePermissions->export())
             ->all();
     }
 

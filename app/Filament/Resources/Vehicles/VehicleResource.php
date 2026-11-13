@@ -14,7 +14,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -57,7 +56,7 @@ class VehicleResource extends Resource
                 Columns::dateTime('last_seen_at', 'Last seen'),
             ])
             ->filters([
-                SelectFilter::make('vehicle_category_id')->label('Vehicle category')->relationship('category', 'name_en')->preload(),
+                Columns::categoryFilter(),
             ])
             ->recordActions([
                 EditAction::make(),

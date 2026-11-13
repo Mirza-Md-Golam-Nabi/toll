@@ -2,24 +2,24 @@
 
 namespace App\Policies;
 
-use App\Enums\UserRole;
+use App\Enums\Permission;
 use App\Models\User;
 use App\Support\Toll;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Shared rules for master data: managers can see it, `$manageRole` can change it,
- * and only where master data is editable (central server or stand-alone booth).
+ * Shared rules for master data: `$viewPermission` lets a role see it, `$managePermission`
+ * lets it change it, and only where master data is editable (central server or stand-alone booth).
  */
 abstract class MasterDataPolicy
 {
-    protected UserRole $viewRole = UserRole::PlazaManager;
+    protected Permission $viewPermission;
 
-    protected UserRole $manageRole = UserRole::PlazaManager;
+    protected Permission $managePermission;
 
     public function viewAny(User $user): bool
     {
-        return $user->isAtLeast($this->viewRole);
+        return $user->hasPermission($this->viewPermission);
     }
 
     public function view(User $user, Model $model): bool
@@ -54,6 +54,6 @@ abstract class MasterDataPolicy
 
     protected function canManage(User $user): bool
     {
-        return $user->isAtLeast($this->manageRole) && Toll::canEditMasterData();
+        return $user->hasPermission($this->managePermission) && Toll::canEditMasterData();
     }
 }

@@ -34,7 +34,7 @@ it('adds an email from the profile as unverified', function () {
     $this->actingAs($user);
 
     Livewire::test(EditProfile::class)
-        ->fillForm(['email' => 'Manager@Example.com', 'currentPassword' => 'password'])
+        ->fillForm(['email' => 'Manager@Example.com', 'currentPassword' => User::DEFAULT_PIN])
         ->call('save')
         ->assertHasNoFormErrors();
 

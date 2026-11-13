@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\VehicleCategories\Schemas;
 
 use App\Filament\Support\Fields;
+use App\Models\VehicleCategory;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -24,10 +25,16 @@ class VehicleCategoryForm
                     ->columnSpan(2)
                     ->columns(2)
                     ->components([
-                        TextInput::make('code')->label('Code')->required()->maxLength(20)->unique(ignoreRecord: true)->placeholder('CAR'),
+                        TextInput::make('code')
+                            ->label('Code')
+                            ->maxLength(20)
+                            ->alphaDash()
+                            ->unique(ignoreRecord: true)
+                            ->mutateStateForValidationUsing(fn (?string $state): ?string => VehicleCategory::normalizeCode($state))
+                            ->placeholder('CAR'),
                         TextInput::make('icon')->label('Icon (emoji)')->maxLength(8)->placeholder('🚗'),
                         TextInput::make('name_bn')->label('Name (Bangla)')->required()->maxLength(255),
-                        TextInput::make('name_en')->label('Name (English)')->required()->maxLength(255),
+                        TextInput::make('name_en')->label('Name (English)')->maxLength(255),
                         Fields::money('initial_rate', 'Initial toll rate')
                             ->required()
                             ->visibleOn('create')
@@ -43,7 +50,7 @@ class VehicleCategoryForm
                             ->unique(ignoreRecord: true)
                             ->native(false),
                         ColorPicker::make('color')->label('Color')->required()->default('#0d9488'),
-                        Fields::sortOrder(),
+                        Fields::sortOrder(VehicleCategory::class),
                         Toggle::make('is_exempt')->label('Exempt (free pass)')->helperText(__('Ambulance, fire service, etc. Requires a reason on each ticket.')),
                         Fields::active(),
                     ]),

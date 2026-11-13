@@ -4,9 +4,11 @@ namespace App\Services\Sync;
 
 use App\Models\Booth;
 use App\Services\RateService;
+use App\Services\RolePermissionService;
 use App\Support\Settings;
 use App\Support\Toll;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -19,6 +21,8 @@ use Throwable;
 class SyncService
 {
     private const STATUS_KEY = 'toll.sync.status';
+
+    public function __construct(private RolePermissionService $rolePermissions) {}
 
     public function run(): array
     {
@@ -74,10 +78,14 @@ class SyncService
     {
         $data = $this->client()->get('master', ['booth_code' => config('toll.booth_code')])->throw()->json('data', []);
 
-        DB::transaction(function () use ($data): void {
+        $rolePermissions = Arr::pull($data, SyncRegistry::ROLE_PERMISSIONS, []);
+
+        DB::transaction(function () use ($data, $rolePermissions): void {
             foreach (SyncRegistry::PULL as $table => $modelClass) {
                 SyncRegistry::upsert($modelClass, $data[$table] ?? []);
             }
+
+            $this->rolePermissions->import($rolePermissions);
         });
 
         RateService::flush();

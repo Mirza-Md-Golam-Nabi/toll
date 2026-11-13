@@ -3,7 +3,7 @@
 namespace App\Support;
 
 use App\Enums\AppMode;
-use App\Enums\UserRole;
+use App\Enums\Permission;
 use App\Models\User;
 
 /**
@@ -30,8 +30,8 @@ class Toll
         return auth()->user();
     }
 
-    public static function userIsAtLeast(UserRole $role): bool
+    public static function userCan(Permission $permission): bool
     {
-        return (bool) self::user()?->isAtLeast($role);
+        return (bool) self::user()?->hasPermission($permission);
     }
 }

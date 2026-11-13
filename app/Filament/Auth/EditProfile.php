@@ -35,6 +35,36 @@ class EditProfile extends BaseEditProfile
         ]);
     }
 
+    protected function getPasswordFormComponent(): Component
+    {
+        return Fields::loginPin('New PIN')
+            ->password()
+            ->revealable()
+            ->autocomplete('new-password')
+            ->dehydrated(fn (?string $state): bool => filled($state))
+            ->live(debounce: 500)
+            ->same('passwordConfirmation');
+    }
+
+    protected function getPasswordConfirmationFormComponent(): Component
+    {
+        /** @var TextInput $field */
+        $field = parent::getPasswordConfirmationFormComponent();
+
+        return $field->label(__('Confirm new PIN'))->validationAttribute(__('Confirm new PIN'))->inputMode('numeric');
+    }
+
+    protected function getCurrentPasswordFormComponent(): Component
+    {
+        /** @var TextInput $field */
+        $field = parent::getCurrentPasswordFormComponent();
+
+        return $field->label(__('Current PIN'))
+            ->validationAttribute(__('Current PIN'))
+            ->belowContent(__('Enter your current PIN to save these changes.'))
+            ->inputMode('numeric');
+    }
+
     protected function getEmailFormComponent(): Component
     {
         return TextInput::make('email')

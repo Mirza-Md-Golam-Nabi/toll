@@ -123,6 +123,25 @@ body, .fi-body { font-family: var(--tl-font); }
 .dark .tl-locked { background: rgb(2 6 23 / .6); color: #e2e8f0; }
 .tl-locked__icon { width: 2.5rem; height: 2.5rem; }
 
+/* Mobile: three compact tiles per row, smaller type, tighter spacing. */
+@media (max-width: 640px) {
+    .tl-collection .tl-layout, .tl-collection .tl-side { gap: .75rem; }
+    .tl-collection .tl-stats { gap: .5rem; margin-bottom: .75rem; }
+    .tl-collection .tl-panel { padding: .6rem; }
+    .tl-collection .tl-panel__header { flex-wrap: wrap; gap: .25rem; margin-bottom: .5rem; }
+    .tl-collection .tl-panel__header h2 { font-size: .9rem; }
+    .tl-collection .tl-muted { font-size: .72rem; }
+
+    .tl-tiles { gap: .4rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tl-tile { min-height: 6rem; padding: .45rem; gap: .05rem; border-radius: .7rem; }
+    .tl-tile__key { top: .3rem; right: .3rem; font-size: .6rem; padding: .05rem .3rem; border-radius: .3rem; }
+    .tl-tile__icon { font-size: 1.4rem; margin-bottom: .15rem; }
+    .tl-tile__name { font-size: .78rem; line-height: 1.15; overflow-wrap: anywhere; }
+    .tl-tile__sub { font-size: .6rem; line-height: 1.15; overflow-wrap: anywhere; }
+    .tl-tile__amount { font-size: .8rem; padding: .05rem .35rem; border-radius: .4rem; margin-top: auto; }
+    .tl-locked { border-radius: .7rem; }
+}
+
 /* Plate input */
 .tl-plate {
     width: 100%; padding: .9rem .75rem; border-radius: .85rem; font-size: 1.1rem; font-weight: 700; letter-spacing: .03em;

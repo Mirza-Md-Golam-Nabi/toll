@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\Concerns;
 
+use App\Enums\Permission;
 use App\Support\Toll;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Booth operators only ever see their own records (by `user_id`); managers see everything.
+ * Users without "see every operator's records" only see their own records (by `user_id`).
  */
 trait ScopesRecordsToOperator
 {
@@ -15,7 +16,7 @@ trait ScopesRecordsToOperator
         $query = parent::getEloquentQuery();
         $user = Toll::user();
 
-        return $user?->isOperator()
+        return $user && ! $user->hasPermission(Permission::ViewAllRecords)
             ? $query->where($query->qualifyColumn('user_id'), $user->id)
             : $query;
     }

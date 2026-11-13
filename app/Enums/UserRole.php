@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Enums\Concerns\EnumHelpers;
+use App\Services\RolePermissionService;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
@@ -23,23 +24,9 @@ enum UserRole: string implements HasColor, HasLabel
         };
     }
 
-    /** Roles whose PIN can approve overrides (void / category correction). */
-    public function canApproveOverrides(): bool
+    /** The Super Admin holds every permission; other roles hold what the Super Admin granted. */
+    public function hasPermission(Permission $permission): bool
     {
-        return $this !== self::BoothOperator;
-    }
-
-    public function rank(): int
-    {
-        return match ($this) {
-            self::SuperAdmin => 3,
-            self::PlazaManager => 2,
-            self::BoothOperator => 1,
-        };
-    }
-
-    public function isAtLeast(self $role): bool
-    {
-        return $this->rank() >= $role->rank();
+        return app(RolePermissionService::class)->roleHas($this, $permission);
     }
 }

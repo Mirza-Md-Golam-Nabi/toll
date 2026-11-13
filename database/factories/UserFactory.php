@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * The hashed default login PIN used by the factory.
      */
     protected static ?string $password;
 
@@ -29,7 +29,7 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'phone' => fake()->unique()->numerify('01'.fake()->numberBetween(3, 9).'########'),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make(User::DEFAULT_PIN),
             'remember_token' => Str::random(10),
             'role' => UserRole::BoothOperator,
             'is_active' => true,

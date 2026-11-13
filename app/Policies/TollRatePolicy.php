@@ -2,11 +2,16 @@
 
 namespace App\Policies;
 
+use App\Enums\Permission;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class TollRatePolicy extends MasterDataPolicy
 {
+    protected Permission $viewPermission = Permission::ViewVehicleCategories;
+
+    protected Permission $managePermission = Permission::ManageTollRates;
+
     /** Rates that already took effect are history and stay untouched. */
     public function update(User $user, Model $model): bool
     {

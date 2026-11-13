@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\Users;
 
 use App\Enums\NavigationGroup;
+use App\Enums\Permission;
 use App\Enums\UserRole;
 use App\Filament\Resources\Concerns\TranslatesModelLabels;
 use App\Filament\Resources\Users\Pages\ManageUsers;
 use App\Filament\Support\Columns;
 use App\Filament\Support\Fields;
 use App\Models\User;
+use App\Support\Toll;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -21,6 +23,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Arr;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -44,16 +47,16 @@ class UserResource extends Resource
                 Fields::mobileNumber()->unique(ignoreRecord: true),
                 TextInput::make('email')->label('Email')->email()->nullable()->maxLength(255)->unique(ignoreRecord: true)
                     ->helperText(__('Optional. Reports are sent only after the user verifies it from their profile.')),
-                Select::make('role')->label('Role')->options(UserRole::class)->required()->live()->native(false),
+                Select::make('role')->label('Role')->options(fn (): array => self::assignableRoles())->required()->live()->native(false),
                 Select::make('booth_id')->label('Booth')->relationship('booth', 'name')->preload()->native(false),
                 Select::make('locale')->label('Language')->options(['bn' => 'বাংলা', 'en' => 'English'])->default('bn')->required()->native(false),
-                TextInput::make('password')
-                    ->label('Password')
-                    ->password()
-                    ->revealable()
+                Fields::loginPin('Login PIN')
+                    ->default(User::DEFAULT_PIN)
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->dehydrated(fn (?string $state): bool => filled($state))
-                    ->minLength(6),
+                    ->helperText(fn (string $operation): string => $operation === 'create'
+                        ? __('The user signs in with this PIN. Tell it to them.')
+                        : __('Leave blank to keep the current PIN.')),
                 TextInput::make('approval_pin')
                     ->label('Approval PIN')
                     ->password()
@@ -62,7 +65,7 @@ class UserResource extends Resource
                     ->minLength(4)
                     ->maxLength(8)
                     ->dehydrated(fn (?string $state): bool => filled($state))
-                    ->visible(fn (Get $get): bool => self::roleOf($get('role'))?->canApproveOverrides() ?? false)
+                    ->visible(fn (Get $get): bool => self::roleOf($get('role'))?->hasPermission(Permission::ApproveOverrides) ?? false)
                     ->helperText(__('Used to approve operator overrides. Leave blank to keep the current PIN.')),
                 Fields::active(),
             ]);
@@ -98,6 +101,18 @@ class UserResource extends Resource
         return [
             'index' => ManageUsers::route('/'),
         ];
+    }
+
+    /**
+     * Only a Super Admin may create another Super Admin.
+     *
+     * @return array<string, string>
+     */
+    private static function assignableRoles(): array
+    {
+        return Toll::user()?->isSuperAdmin()
+            ? UserRole::options()
+            : Arr::except(UserRole::options(), UserRole::SuperAdmin->value);
     }
 
     private static function roleOf(mixed $role): ?UserRole

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Enums\AuditEvent;
 use App\Models\AuditLog;
 use App\Models\Booth;
+use App\Models\MobileDevice;
 use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\ShiftSession;
@@ -14,6 +15,8 @@ use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleCategory;
 use App\Services\AuditLogger;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Field;
 use Filament\Infolists\Components\Entry;
 use Filament\Support\Assets\Css;
@@ -54,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
             'vehicle' => Vehicle::class,
             'setting' => Setting::class,
             'audit_log' => AuditLog::class,
+            'mobile_device' => MobileDevice::class,
         ]);
     }
 
@@ -64,6 +68,14 @@ class AppServiceProvider extends ServiceProvider
         Entry::configureUsing(fn (Entry $entry) => $entry->translateLabel());
         Column::configureUsing(fn (Column $column) => $column->translateLabel());
         BaseFilter::configureUsing(fn (BaseFilter $filter) => $filter->translateLabel());
+
+        // Edit and delete actions render as icon-only buttons; the label stays available as a tooltip.
+        EditAction::configureUsing(fn (EditAction $action) => $action
+            ->iconButton()
+            ->tooltip(fn (): string => $action->getLabel()));
+        DeleteAction::configureUsing(fn (DeleteAction $action) => $action
+            ->iconButton()
+            ->tooltip(fn (): string => $action->getLabel()));
 
         FilamentAsset::register([
             Css::make('toll', resource_path('css/toll.css')),

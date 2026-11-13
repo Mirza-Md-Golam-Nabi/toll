@@ -35,6 +35,9 @@ final class SyncRegistry
         'settings' => Setting::class,
     ];
 
+    /** Key of the role => permission names map served with the master data. */
+    public const ROLE_PERMISSIONS = 'role_permissions';
+
     /** Columns that the remote side may write for a model (fillable + key + timestamps). */
     public static function writableColumns(string $modelClass): array
     {

@@ -2,9 +2,11 @@
 
 namespace App\Policies;
 
-use App\Enums\UserRole;
+use App\Enums\Permission;
 
 class BoothPolicy extends MasterDataPolicy
 {
-    protected UserRole $manageRole = UserRole::SuperAdmin;
+    protected Permission $viewPermission = Permission::ViewBooths;
+
+    protected Permission $managePermission = Permission::ManageBooths;
 }

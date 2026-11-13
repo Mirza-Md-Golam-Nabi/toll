@@ -30,7 +30,7 @@ class VehicleCategoryResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
-    protected static ?string $recordTitleAttribute = 'name_en';
+    protected static ?string $recordTitleAttribute = 'name_bn';
 
     public static function form(Schema $schema): Schema
     {

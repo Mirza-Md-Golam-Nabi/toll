@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
 
-#[Signature('toll:create-admin {--name=} {--phone=} {--password=} {--pin=}')]
+#[Signature('toll:create-admin {--name=} {--phone=} {--login-pin=} {--pin=}')]
 #[Description('Create (or reset) a Super Admin account for a fresh installation')]
 class CreateAdminCommand extends Command
 {
@@ -24,14 +24,14 @@ class CreateAdminCommand extends Command
         $data = [
             'name' => $this->option('name') ?? text('Name', required: true),
             'phone' => $this->option('phone') ?? text('Mobile number (11 digits, e.g. 01712345678)', required: true),
-            'password' => $this->option('password') ?? password('Password (min 8 characters)', required: true),
+            'password' => $this->option('login-pin') ?? text('Login PIN (4-5 digits)', default: User::DEFAULT_PIN, required: true),
             'approval_pin' => $this->option('pin') ?? password('Approval PIN (4-8 digits)', required: true),
         ];
 
         $validator = Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', new BangladeshMobileNumber],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'digits_between:4,5'],
             'approval_pin' => ['required', 'digits_between:4,8'],
         ]);
 

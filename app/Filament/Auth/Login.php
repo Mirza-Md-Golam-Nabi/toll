@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use SensitiveParameter;
 
 /**
- * Panel login with the 11-digit Bangladeshi mobile number instead of an email address.
+ * Panel login with the 11-digit Bangladeshi mobile number and a 4-5 digit PIN.
  */
 class Login extends BaseLogin
 {
@@ -19,6 +19,15 @@ class Login extends BaseLogin
         return Fields::mobileNumber()
             ->autocomplete('tel')
             ->autofocus();
+    }
+
+    protected function getPasswordFormComponent(): Component
+    {
+        return Fields::loginPin()
+            ->password()
+            ->revealable()
+            ->autocomplete('current-password')
+            ->required();
     }
 
     /**

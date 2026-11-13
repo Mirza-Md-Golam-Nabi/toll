@@ -23,7 +23,6 @@ class VehicleCategoryFactory extends Factory
             'icon' => '🚗',
             'is_exempt' => false,
             'is_active' => true,
-            'sort_order' => 0,
         ];
     }
 

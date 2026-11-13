@@ -24,7 +24,7 @@ class TollTransactionInfolist
                         TextEntry::make('ticket_no')->label('Ticket')->fontFamily('mono')->weight('bold')->copyable(),
                         TextEntry::make('issued_at')->label('Issued at')->dateTime('d M Y, h:i:s A'),
                         TextEntry::make('status')->label('Status')->badge(),
-                        TextEntry::make('category.name_en')->label('Vehicle category')
+                        TextEntry::make('category.name_bn')->label('Vehicle category')
                             ->formatStateUsing(fn (TollTransaction $record): string => $record->category->display_name),
                         TextEntry::make('amount')->label('Amount')->formatStateUsing(fn ($state): string => Money::format($state))->size('lg')->weight('bold')->color('primary'),
                         TextEntry::make('exempt_reason')->label('Exempt reason')->placeholder('—'),

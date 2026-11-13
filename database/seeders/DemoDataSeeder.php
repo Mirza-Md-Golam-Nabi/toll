@@ -28,8 +28,8 @@ class DemoDataSeeder extends Seeder
 
     /** Relative traffic weight per category code. */
     private const WEIGHTS = [
-        'MC' => 30, 'CNG' => 20, 'CAR' => 15, 'MICRO' => 8, 'PICKUP' => 7, 'MINIBUS' => 4,
-        'BUS' => 5, 'TRUCK_S' => 5, 'TRUCK_L' => 4, 'TRAILER' => 1, 'EXEMPT' => 1,
+        'CAR' => 30, 'MICRO' => 20, '4WD' => 12, 'MINIBUS' => 8, 'BUS' => 8, 'TRUCK_S' => 7,
+        'TRUCK_M' => 5, 'TRUCK_L' => 5, 'AGRI' => 3, 'TRAILER' => 1, 'EXEMPT' => 1,
     ];
 
     private const DISTRICTS = ['DHAKA METRO', 'JASHORE', 'KHULNA', 'MAGURA', 'NARAIL', 'JHENAIDAH', 'GOPALGANJ'];
@@ -44,18 +44,37 @@ class DemoDataSeeder extends Seeder
 
         for ($day = self::DAYS; $day >= 1; $day--) {
             $date = CarbonImmutable::today()->subDays($day);
-            $sequence = 0;
 
-            foreach ($shifts as $shift) {
-                $sequence = $this->seedShift($booth, $operator, $shift, $date, $categories, $pool, $sequence, $vehicles);
-            }
+            // One transaction per day: a failed run never leaves half a day behind.
+            DB::transaction(function () use ($booth, $operator, $shifts, $date, $categories, $pool, $vehicles): void {
+                $sequence = $this->lastTicketNumber($booth, $date);
 
-            TicketSequence::query()->upsert(
-                [['booth_id' => $booth->id, 'sequence_date' => $date->toDateString(), 'last_number' => $sequence]],
-                ['booth_id', 'sequence_date'],
-                ['last_number'],
-            );
+                foreach ($shifts as $shift) {
+                    $sequence = $this->seedShift($booth, $operator, $shift, $date, $categories, $pool, $sequence, $vehicles);
+                }
+
+                TicketSequence::query()->upsert(
+                    [['booth_id' => $booth->id, 'sequence_date' => $date->toDateString(), 'last_number' => $sequence]],
+                    ['booth_id', 'sequence_date'],
+                    ['last_number'],
+                );
+            });
         }
+    }
+
+    /** Highest ticket number already issued that day, so re-running the seeder appends instead of colliding. */
+    private function lastTicketNumber(Booth $booth, CarbonImmutable $date): int
+    {
+        $lastTicketNo = DB::table('toll_transactions')
+            ->where('ticket_no', 'like', $this->ticketPrefix($booth, $date).'%')
+            ->max('ticket_no');
+
+        return $lastTicketNo ? (int) Str::afterLast($lastTicketNo, '-') : 0;
+    }
+
+    private function ticketPrefix(Booth $booth, CarbonImmutable $date): string
+    {
+        return sprintf('%s-%s-', $booth->code, $date->format('ymd'));
     }
 
     private function seedShift(Booth $booth, User $operator, Shift $shift, CarbonImmutable $date, $categories, array $pool, int $sequence, VehicleRegistry $vehicles): int
@@ -74,7 +93,7 @@ class DemoDataSeeder extends Seeder
 
             $rows[] = [
                 'id' => (string) Str::uuid(),
-                'ticket_no' => sprintf('%s-%s-%06d', $booth->code, $date->format('ymd'), ++$sequence),
+                'ticket_no' => $this->ticketPrefix($booth, $date).sprintf('%06d', ++$sequence),
                 'booth_id' => $booth->id,
                 'shift_session_id' => $sessionId,
                 'user_id' => $operator->id,

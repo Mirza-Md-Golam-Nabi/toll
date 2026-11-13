@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'ticket_no', 'booth_id', 'shift_session_id', 'user_id', 'vehicle_category_id', 'amount', 'status',
+    'ticket_no', 'booth_id', 'shift_session_id', 'user_id', 'mobile_device_id', 'vehicle_category_id', 'amount', 'status',
     'exempt_reason', 'plate_number', 'plate_source', 'plate_image', 'anpr_confidence', 'direction',
     'print_count', 'issued_at', 'voided_at', 'voided_by', 'approved_by', 'void_reason', 'synced_at',
 ])]
@@ -49,6 +49,11 @@ class TollTransaction extends Model
     public function operator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function mobileDevice(): BelongsTo
+    {
+        return $this->belongsTo(MobileDevice::class);
     }
 
     public function category(): BelongsTo

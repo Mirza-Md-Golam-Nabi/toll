@@ -2,21 +2,26 @@
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Widgets\Concerns\VisibleToManagers;
+use App\Enums\Permission;
 use App\Services\Reports\ReportFilters;
 use App\Services\Reports\ReportService;
 use App\Support\Money;
+use App\Support\Toll;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class TollStatsOverview extends StatsOverviewWidget
 {
-    use VisibleToManagers;
-
     protected static ?int $sort = 1;
 
     protected ?string $pollingInterval = '30s';
+
+    /** Which roles see the collection summary is chosen by the Super Admin on the role screen. */
+    public static function canView(): bool
+    {
+        return Toll::userCan(Permission::ViewCollectionSummary);
+    }
 
     protected function getStats(): array
     {

@@ -2,11 +2,13 @@
 
 namespace App\Filament\Support;
 
+use App\Models\VehicleCategory;
 use App\Support\Money;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 
 /**
  * Reusable table columns so every list renders money, dates and flags the same way.
@@ -49,12 +51,18 @@ final class Columns
     /** Vehicle category with its own colour, via an eager-loaded relation. */
     public static function category(string $relation = 'category'): TextColumn
     {
-        return TextColumn::make("{$relation}.name_en")
+        return TextColumn::make("{$relation}.name_bn")
             ->label('Vehicle category')
             ->formatStateUsing(fn ($record): ?string => $record->{$relation}?->display_name)
             ->placeholder('—')
             ->badge()
             ->color(fn ($record): array|string => $record->{$relation} ? Color::hex($record->{$relation}->color) : 'gray');
+    }
+
+    /** Filter by vehicle category (localised names, collection-screen order). */
+    public static function categoryFilter(string $name = 'vehicle_category_id'): SelectFilter
+    {
+        return SelectFilter::make($name)->label('Vehicle category')->options(fn (): array => VehicleCategory::options());
     }
 
     /** @return array<int, TextColumn> */

@@ -21,12 +21,13 @@ enum AuditEvent: string implements HasColor, HasLabel
     case TicketVoided = 'ticket_voided';
     case CategoryCorrected = 'category_corrected';
     case TicketReprinted = 'ticket_reprinted';
+    case PermissionsChanged = 'permissions_changed';
 
     public function getColor(): string
     {
         return match ($this) {
             self::Created, self::TicketIssued, self::ShiftOpened => 'success',
-            self::Updated, self::CategoryCorrected, self::TicketReprinted => 'warning',
+            self::Updated, self::CategoryCorrected, self::TicketReprinted, self::PermissionsChanged => 'warning',
             self::Deleted, self::TicketVoided => 'danger',
             default => 'gray',
         };

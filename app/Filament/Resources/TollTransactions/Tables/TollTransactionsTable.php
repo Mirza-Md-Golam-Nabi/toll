@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\TollTransactions\Tables;
 
+use App\Enums\Permission;
 use App\Enums\TransactionStatus;
-use App\Enums\UserRole;
 use App\Filament\Actions\TicketActions;
 use App\Filament\Support\Columns;
 use App\Support\Toll;
@@ -51,12 +51,12 @@ class TollTransactionsTable
                         ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->where('issued_at', '<', now()->parse($date)->addDay())))
                     ->columnSpan(2),
                 SelectFilter::make('status')->label('Status')->options(TransactionStatus::class),
-                SelectFilter::make('vehicle_category_id')->label('Vehicle category')->relationship('category', 'name_en')->preload(),
+                Columns::categoryFilter(),
                 SelectFilter::make('user_id')
                     ->label('Operator')
                     ->relationship('operator', 'name')
                     ->preload()
-                    ->visible(fn (): bool => Toll::userIsAtLeast(UserRole::PlazaManager)),
+                    ->visible(fn (): bool => Toll::userCan(Permission::ViewAllRecords)),
             ])
             ->filtersLayout(FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(5)

@@ -67,7 +67,7 @@ class ReportService
             ->orderBy('vehicle_categories.sort_order')
             ->get()
             ->map(fn (object $row) => [
-                'label' => app()->getLocale() === 'bn' ? $row->name_bn : $row->name_en,
+                'label' => app()->getLocale() === 'bn' ? $row->name_bn : ($row->name_en ?: $row->name_bn),
                 'color' => $row->color,
             ] + TransactionAggregates::normalize($row));
     }
@@ -130,7 +130,7 @@ class ReportService
                 ->orderBy('toll_transactions.issued_at')
                 ->select([
                     'toll_transactions.ticket_no', 'toll_transactions.issued_at', 'booths.code AS booth',
-                    'vehicle_categories.name_en AS category', 'toll_transactions.plate_number',
+                    DB::raw('COALESCE(vehicle_categories.name_en, vehicle_categories.name_bn) AS category'), 'toll_transactions.plate_number',
                     'toll_transactions.amount', 'toll_transactions.status', 'users.name AS operator', 'shifts.name AS shift',
                 ])
                 ->cursor();
