@@ -51,7 +51,7 @@ class VehicleCategoryForm
                             ->native(false),
                         ColorPicker::make('color')->label('Color')->required()->default('#0d9488'),
                         Fields::sortOrder(VehicleCategory::class),
-                        Toggle::make('is_exempt')->label('Exempt (free pass)')->helperText(__('Ambulance, fire service, etc. Requires a reason on each ticket.')),
+                        Toggle::make('is_exempt')->label('Exempt (free pass)')->helperText(__('Ambulance, fire service, etc. A reason can optionally be noted on each ticket.')),
                         Fields::active(),
                     ]),
             ]);

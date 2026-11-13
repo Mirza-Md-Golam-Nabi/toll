@@ -57,6 +57,24 @@ it('lets the super admin change a role and audits the change', function () {
     $this->actingAs($manager)->get(UserResource::getUrl())->assertOk();
 });
 
+it('explains every permission in both languages with an info icon on the role screen', function () {
+    foreach (['en', 'bn'] as $locale) {
+        app()->setLocale($locale);
+
+        foreach (Permission::cases() as $permission) {
+            expect($permission->description())->not->toBe('enums.permission_description.'.$permission->name);
+        }
+    }
+
+    app()->setLocale('en');
+
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->get(RoleResource::getUrl('edit', ['record' => roleRecord(UserRole::BoothOperator)]))
+        ->assertOk()
+        ->assertSee('fi-role-permission-info', escape: false)
+        ->assertSee(Permission::ViewShiftSummary->description());
+});
+
 it('keeps role management to the super admin and the super admin role untouchable', function () {
     $this->actingAs(User::factory()->manager()->create())->get(RoleResource::getUrl())->assertForbidden();
 

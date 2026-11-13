@@ -3,6 +3,7 @@
 namespace App\Services\Mobile;
 
 use App\Enums\AuditEvent;
+use App\Enums\Permission;
 use App\Enums\PlateSource;
 use App\Enums\ShiftStatus;
 use App\Enums\TransactionStatus;
@@ -48,6 +49,7 @@ class MobileSyncService
                 'name' => $device->user->name,
                 'phone' => $device->user->phone,
                 'role' => $device->user->role->value,
+                'can_view_summary' => $device->user->hasPermission(Permission::ViewShiftSummary),
             ],
             'device' => [
                 'code' => $device->code,

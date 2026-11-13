@@ -45,16 +45,18 @@ it('counts repeat passes of the same plate', function () {
     expect(Vehicle::query()->where('plate_number', 'KHULNA-KA 11-1111')->value('pass_count'))->toBe(2);
 });
 
-it('requires a reason for exempt vehicles and charges nothing', function () {
+it('issues exempt tickets free of charge with an optional reason', function () {
     openShift($this->setup);
     $ambulance = VehicleCategory::factory()->exempt()->create();
 
-    expect(fn () => $this->service->issue($this->setup->operator, $ambulance))->toThrow(TollException::class);
+    $withoutReason = $this->service->issue($this->setup->operator, $ambulance, exemptReason: '   ');
+    $withReason = $this->service->issue($this->setup->operator, $ambulance, exemptReason: 'Emergency patient');
 
-    $ticket = $this->service->issue($this->setup->operator, $ambulance, exemptReason: 'Emergency patient');
-
-    expect($ticket->status)->toBe(TransactionStatus::Exempt)
-        ->and($ticket->amount)->toBe('0.00');
+    expect($withoutReason->status)->toBe(TransactionStatus::Exempt)
+        ->and($withoutReason->amount)->toBe('0.00')
+        ->and($withoutReason->exempt_reason)->toBeNull()
+        ->and($withReason->status)->toBe(TransactionStatus::Exempt)
+        ->and($withReason->exempt_reason)->toBe('Emergency patient');
 });
 
 it('applies a new rate only from its effective time', function () {

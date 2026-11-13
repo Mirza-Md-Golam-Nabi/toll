@@ -43,9 +43,7 @@ class TollTransactionService
             throw TollException::because('This vehicle category is inactive.');
         }
 
-        if ($category->is_exempt && blank($exemptReason)) {
-            throw TollException::because('A reason is required for exempt vehicles.');
-        }
+        $exemptReason = filled($exemptReason) ? trim($exemptReason) : null;
 
         $plate = PlateNumber::normalize($plateNumber);
         $issuedAt = now();

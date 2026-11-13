@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\AuditEvent;
+use App\Enums\Permission;
 use App\Enums\ShiftStatus;
 use App\Enums\TransactionStatus;
+use App\Enums\UserRole;
 use App\Filament\Resources\MobileDevices\MobileDeviceResource;
 use App\Filament\Resources\MobileDevices\Pages\ManageMobileDevices;
 use App\Models\AuditLog;
@@ -14,6 +16,7 @@ use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleCategory;
 use App\Services\Mobile\MobileDeviceService;
+use App\Services\RolePermissionService;
 use App\Support\MobileApp;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Str;
@@ -148,6 +151,16 @@ it('rejects missing, signed-out and blocked tokens', function () {
     $other = signedInPhone($this->setup->operator);
     $this->postJson('/api/mobile/logout', [], $other->headers)->assertOk();
     $this->getJson('/api/mobile/bootstrap', $other->headers)->assertUnauthorized();
+});
+
+it('tells the app whether the user may see the shift summary', function () {
+    $phone = signedInPhone($this->setup->operator);
+
+    $this->getJson('/api/mobile/bootstrap', $phone->headers)->assertJsonPath('data.user.can_view_summary', true);
+
+    app(RolePermissionService::class)->update(UserRole::BoothOperator, [Permission::CollectToll]);
+
+    $this->getJson('/api/mobile/bootstrap', $phone->headers)->assertJsonPath('data.user.can_view_summary', false);
 });
 
 it('stores offline shifts and tickets idempotently under the phone, its booth and operator', function () {

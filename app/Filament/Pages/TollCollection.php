@@ -180,10 +180,10 @@ class TollCollection extends Page
             ->modalHeading(__('Exempt vehicle'))
             ->modalWidth('md')
             ->modalSubmitActionLabel(__('Issue ticket'))
-            ->schema([Fields::reason('exempt_reason', 'Exempt reason')])
+            ->schema([Fields::reason('exempt_reason', 'Exempt reason')->required(false)])
             ->action(fn (array $data, array $arguments) => $this->issueTicket(
                 $this->categories->firstWhere('id', $arguments['category']),
-                $data['exempt_reason'],
+                $data['exempt_reason'] ?? null,
             ));
     }
 

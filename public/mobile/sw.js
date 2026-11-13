@@ -6,8 +6,8 @@
  * the internet is back (even with the app closed) and it pushes them to the central server.
  * Bump CACHE_VERSION (and App\Support\MobileApp::VERSION) after changing the app files.
  */
-const CACHE_VERSION = 'toll-mobile-1.1.0';
-const ASSET_VERSION = '1.1.0';
+const CACHE_VERSION = 'toll-mobile-1.1.3';
+const ASSET_VERSION = '1.1.3';
 
 importScripts('/mobile/sync-core.js?v=' + ASSET_VERSION);
 

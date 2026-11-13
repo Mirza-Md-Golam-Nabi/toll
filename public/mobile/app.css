@@ -159,7 +159,7 @@ table.summary tfoot td { font-weight: 800; border-bottom: 0; }
 
 /* ---------- Bottom navigation ---------- */
 .bottomnav {
-    position: sticky; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, 1fr);
+    position: sticky; bottom: 0; z-index: 10; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
     background: var(--card); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom);
 }
 .bottomnav button {

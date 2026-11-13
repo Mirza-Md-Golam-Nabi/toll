@@ -1,5 +1,5 @@
 <?php
 
-it('redirects the home page to the admin panel', function () {
-    $this->get('/')->assertRedirect('/admin');
+it('serves the public home page', function () {
+    $this->get('/')->assertOk();
 });

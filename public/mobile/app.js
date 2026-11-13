@@ -43,7 +43,7 @@
             start: 'শুরু করুন',
             plateOptional: 'নম্বর প্লেট (ঐচ্ছিক)',
             clear: 'মুছুন',
-            exemptReason: 'ছাড়ের কারণ',
+            exemptReason: 'ছাড়ের কারণ (ঐচ্ছিক)',
             exemptReasonHint: 'যেমন: অ্যাম্বুলেন্স — রোগী বহন',
             reasonRequired: 'কারণ লিখতে হবে।',
             issue: 'টিকিট দিন',
@@ -123,7 +123,7 @@
             start: 'Start',
             plateOptional: 'Number plate (optional)',
             clear: 'Clear',
-            exemptReason: 'Exemption reason',
+            exemptReason: 'Exemption reason (optional)',
             exemptReasonHint: 'e.g. Ambulance — carrying a patient',
             reasonRequired: 'A reason is required.',
             issue: 'Issue ticket',
@@ -945,9 +945,12 @@
             ${statusPill()}
         </header>`;
 
+    /** The summary tab follows the "View shift summary" permission of the user's role. */
+    const canViewSummary = () => state.master?.user?.can_view_summary === true;
+
     const bottomnav = () => `
         <nav class="bottomnav">
-            ${[['collect', '🎫'], ['summary', '📊'], ['settings', '⚙️']].map(([screen, icon]) => `
+            ${[['collect', '🎫'], ['summary', '📊'], ['settings', '⚙️']].filter(([screen]) => screen !== 'summary' || canViewSummary()).map(([screen, icon]) => `
                 <button data-nav="${screen}" class="${state.screen === screen ? 'is-active' : ''}"><span>${icon}</span>${esc(t(screen))}</button>`).join('')}
         </nav>`;
 
@@ -1152,6 +1155,10 @@
             return;
         }
 
+        if (state.screen === 'summary' && !canViewSummary()) {
+            state.screen = 'collect';
+        }
+
         if (state.screen === 'summary') {
             app.innerHTML = await summaryScreen();
         } else if (state.screen === 'settings') {
@@ -1226,7 +1233,7 @@
         if (c.is_exempt) {
             const values = await modal({
                 title: `${c.icon || ''} ${categoryName(c)}`,
-                body: `<div class="field"><label for="reason">${esc(t('exemptReason'))}</label><input class="input" id="reason" name="reason" placeholder="${esc(t('exemptReasonHint'))}" required></div>`,
+                body: `<div class="field"><label for="reason">${esc(t('exemptReason'))}</label><input class="input" id="reason" name="reason" placeholder="${esc(t('exemptReasonHint'))}"></div>`,
                 confirm: t('issue'),
             });
 
@@ -1234,7 +1241,7 @@
                 return;
             }
 
-            reason = values.reason.trim();
+            reason = (values.reason || '').trim() || null;
         }
 
         state.busy = true;

@@ -45,6 +45,12 @@ enum Permission: string implements HasLabel
         return __('enums.permission.'.$this->name);
     }
 
+    /** A longer explanation of what this permission unlocks, shown in the info tooltip on the role screen. */
+    public function description(): string
+    {
+        return __('enums.permission_description.'.$this->name);
+    }
+
     /** The section this permission is listed under on the role screen (e.g. `booths`). */
     public function group(): string
     {
