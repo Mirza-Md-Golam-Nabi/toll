@@ -62,7 +62,7 @@
             box-shadow: 0 0 0 1px rgb(255 255 255 / .15) inset, 0 10px 30px -8px rgb(45 212 191 / .6);
         }
         .brand__mark svg { width: 1.4rem; height: 1.4rem; }
-        .brand__title { display: block; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .brand__title { display: block; font-weight: 700; line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .brand__sub { display: block; font-size: .78rem; color: var(--muted); }
         .nav__actions { display: flex; align-items: center; gap: .5rem; flex: none; }
         .lang { display: flex; padding: .2rem; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); }
@@ -91,8 +91,8 @@
         @keyframes ping { 70% { box-shadow: 0 0 0 .55rem rgb(45 212 191 / 0); } 100% { box-shadow: 0 0 0 0 rgb(45 212 191 / 0); } }
 
         .hero__title {
-            margin: 1.4rem auto .6rem; max-width: 18ch; font-family: var(--display); font-weight: 800;
-            font-size: clamp(2.4rem, 7vw, 5.2rem); line-height: 1.05; letter-spacing: -.01em;
+            margin: 1.4rem auto 0; max-width: 18ch; font-family: var(--display); font-weight: 800;
+            font-size: clamp(2.4rem, 7vw, 5.2rem); line-height: 1.4; padding-block: .1em 0; letter-spacing: -.01em;
             background: linear-gradient(100deg, #fff 10%, #99f6e4 35%, var(--amber) 60%, #fff 85%);
             background-size: 220% auto; -webkit-background-clip: text; background-clip: text; color: transparent;
             animation: shine 7s linear infinite;
