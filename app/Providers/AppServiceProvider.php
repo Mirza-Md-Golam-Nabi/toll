@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\AuditEvent;
+use App\Http\Responses\LogoutResponse;
 use App\Models\AuditLog;
 use App\Models\Booth;
 use App\Models\MobileDevice;
@@ -17,6 +18,7 @@ use App\Models\VehicleCategory;
 use App\Services\AuditLogger;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse as LogoutResponseContract;
 use Filament\Forms\Components\Field;
 use Filament\Infolists\Components\Entry;
 use Filament\Support\Assets\Css;
@@ -33,6 +35,11 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->bind(LogoutResponseContract::class, LogoutResponse::class);
+    }
+
     public function boot(): void
     {
         $this->configureModels();

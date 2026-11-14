@@ -1140,7 +1140,10 @@
                         <button class="btn btn--ghost" data-action="toggle-lang">${esc(t('language'))}: ${state.lang === 'bn' ? 'English' : 'বাংলা'}</button>
                         ${installPrompt ? `<button class="btn btn--ghost" data-action="install">${esc(t('install'))}</button>` : ''}
                     </div>
-                    <button class="btn btn--ghost" data-action="logout">${esc(t('logout'))}</button>
+                    <div class="row">
+                        ${state.session ? `<button class="btn btn--danger" data-action="close-shift">⏹ ${esc(t('closeShift'))}</button>` : ''}
+                        <button class="btn btn--ghost" data-action="logout">${esc(t('logout'))}</button>
+                    </div>
                 </section>
             </main>
             ${bottomnav()}`;
@@ -1219,7 +1222,36 @@
         await Promise.all(['auth', 'master', 'owner_phone'].map(kvDelete));
         state.auth = null;
         state.master = null;
-        render();
+        window.location.href = '/';
+    };
+
+    /** Close the shift from the settings tab: asks for the counted cash, then closes like the summary form. */
+    const promptCloseShift = async () => {
+        if (!state.session) {
+            return;
+        }
+
+        // Operators without summary access count the cash blind, so the expected amount is not prefilled for them.
+        const expected = canViewSummary() ? (await shiftTotals(state.session)).expected : '';
+        const values = await modal({
+            title: t('closeShift'),
+            body: `
+                <p>${esc(t('closeConfirm'))}</p>
+                <div class="field">
+                    <label for="modal_declared_cash">${esc(t('declaredCash'))}</label>
+                    <input class="input input--big" id="modal_declared_cash" name="declared_cash" type="number" inputmode="decimal" min="0" step="1" value="${expected}" required data-message="${esc(t('declaredCash'))}">
+                </div>
+                <div class="field">
+                    <label for="modal_notes">${esc(t('notes'))}</label>
+                    <textarea class="input" id="modal_notes" name="notes" rows="2"></textarea>
+                </div>`,
+            confirm: t('closeShift'),
+            danger: true,
+        });
+
+        if (values) {
+            await closeShift(values.declared_cash, (values.notes || '').trim());
+        }
     };
 
     const onCategory = async (button) => {
@@ -1329,6 +1361,9 @@
                 case 'install':
                     installPrompt?.prompt();
                     installPrompt = null;
+                    break;
+                case 'close-shift':
+                    promptCloseShift();
                     break;
                 case 'logout':
                     signOut();

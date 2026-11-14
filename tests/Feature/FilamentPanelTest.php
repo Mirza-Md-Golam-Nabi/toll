@@ -111,3 +111,11 @@ it('lets the super admin choose which roles see the ticket and shift session men
 
     expect($ticket->shiftSession->fresh()->isOpen())->toBeFalse();
 });
+
+it('redirects to the home page after signing out of the panel', function () {
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->post(route('filament.admin.auth.logout'))
+        ->assertRedirect(route('home'));
+
+    $this->assertGuest();
+});
